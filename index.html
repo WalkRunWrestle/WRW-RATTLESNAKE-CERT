@@ -66,7 +66,6 @@
 
   <div id="status">Loading certificate image…</div>
 
-  <!-- REQUIRED -->
   <canvas id="canvas"></canvas>
 
   <script>
@@ -98,7 +97,7 @@
 
     function drawName(name) {
       ctx.font = "120px Impact";
-      ctx.fillStyle = "#000000";
+      ctx.fillStyle = "#f5f5f5";   // softer white
       ctx.textAlign = "center";
 
       // Drop shadow
@@ -108,7 +107,7 @@
       ctx.shadowOffsetY = 3;
 
       const x = canvas.width / 2;
-      const y = canvas.height * 0.67;   // position under AWARDED TO
+      const y = canvas.height * 0.67;   // under AWARDED TO
 
       ctx.fillText(name, x, y);
 
@@ -124,8 +123,8 @@
         year: "numeric"
       });
 
-      ctx.font = "42px Arial";
-      ctx.fillStyle = "#222222";
+      ctx.font = "36px Arial";
+      ctx.fillStyle = "#000000";   // black date
       ctx.textAlign = "center";
 
       ctx.shadowColor = "rgba(0,0,0,0.35)";
@@ -134,7 +133,7 @@
       ctx.shadowOffsetY = 2;
 
       const x = canvas.width / 2;
-      const y = canvas.height * 0.93;
+      const y = canvas.height * 0.83;   // under 10 KILOMETERS
 
       ctx.fillText(dateString, x, y);
 
