@@ -34,7 +34,7 @@ function generateCert() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(certImage, 0, 0);
 
-  // Name styling
+  // ===== NAME =====
   ctx.font = "120px Impact";
   ctx.fillStyle = "#000000";
   ctx.textAlign = "center";
@@ -45,13 +45,29 @@ function generateCert() {
   ctx.shadowOffsetX = 3;
   ctx.shadowOffsetY = 3;
 
-  // Position (perfect under AWARDED TO)
-  const x = canvas.width / 2;
-  const y = canvas.height * 0.67;
+  const nameX = canvas.width / 2;
+  const nameY = canvas.height * 0.67;
+  ctx.fillText(name, nameX, nameY);
 
-  ctx.fillText(name, x, y);
+  // ===== DATE =====
+  const today = new Date();
+  const dateString = today.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric"
+  });
 
-  // Reset shadow so it doesn't affect anything else
+  ctx.font = "42px Arial";
+  ctx.fillStyle = "#ffffff";
+  ctx.shadowColor = "rgba(0,0,0,0.4)";
+  ctx.shadowBlur = 4;
+
+  const dateX = canvas.width / 2;
+  const dateY = canvas.height * 0.77;
+
+  ctx.fillText(dateString, dateX, dateY);
+
+  // Reset shadow
   ctx.shadowColor = "transparent";
 }
 
