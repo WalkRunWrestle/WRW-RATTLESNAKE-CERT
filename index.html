@@ -24,7 +24,7 @@ input{
   padding:14px;
   font-size:18px;
   width:90%;
-  max-width:400px;
+  max-width:520px;
   border-radius:10px;
   border:none;
   margin-bottom:12px;
@@ -33,7 +33,7 @@ input{
 button{
   display:block;
   width:90%;
-  max-width:400px;
+  max-width:520px;
   margin:10px auto;
   padding:16px;
   font-size:20px;
@@ -45,9 +45,7 @@ button{
   cursor:pointer;
 }
 
-button:disabled{
-  opacity:0.5;
-}
+button:disabled{ opacity:0.5; cursor:not-allowed; }
 
 #status{
   margin-top:14px;
@@ -89,7 +87,7 @@ const downloadBtn = document.getElementById("downloadBtn");
 const status = document.getElementById("status");
 
 const certImage = new Image();
-certImage.src = "certificate.png";
+certImage.src = "certificate.png"; // MUST match filename in repo
 
 let imageLoaded = false;
 let hasGenerated = false;
@@ -106,36 +104,92 @@ certImage.onerror = () => {
   status.textContent = "ERROR: certificate.png failed to load.";
 };
 
-function drawName(name){
-  const upperName = name.toUpperCase();
+/* ---------- TEXT HELPERS ---------- */
+function measure(text, font){
+  ctx.font = font;
+  return ctx.measureText(text).width;
+}
 
-  let fontSize = Math.round(canvas.width * 0.095);
-  ctx.font = `900 ${fontSize}px Impact`;
+function splitToTwoLines(words){
+  // Balanced split (best for 3-5 words names)
+  if (words.length < 2) return [words.join(" ")];
 
-  while(ctx.measureText(upperName).width > canvas.width * 0.8){
-    fontSize -= 2;
-    ctx.font = `900 ${fontSize}px Impact`;
+  let best = null;
+  for (let i = 1; i < words.length; i++){
+    const a = words.slice(0,i).join(" ");
+    const b = words.slice(i).join(" ");
+    const diff = Math.abs(a.length - b.length);
+    if (!best || diff < best.diff) best = { a, b, diff };
   }
+  return [best.a, best.b];
+}
+
+function drawFittedLine(text, x, y, maxWidth, startPx, minPx){
+  let fontSize = startPx;
+  let font = `900 ${fontSize}px Impact`;
+
+  while (measure(text, font) > maxWidth && fontSize > minPx){
+    fontSize -= 2;
+    font = `900 ${fontSize}px Impact`;
+  }
+
+  ctx.font = font;
+  ctx.fillText(text, x, y);
+  return fontSize;
+}
+
+/* ---------- DRAW NAME (FIXED FOR LONG NAMES) ---------- */
+function drawName(name){
+  const upperName = name.toUpperCase().replace(/\s+/g, " ").trim();
+
+  // SAFE BOX: avoid fox on left + keep inside right border
+  const safeLeft  = canvas.width * 0.20;  // push right of fox
+  const safeRight = canvas.width * 0.94;  // keep inside frame
+  const maxWidth  = safeRight - safeLeft;
+  const x = (safeLeft + safeRight) / 2;
+
+  // Base Y (your sweet spot)
+  const baseY = canvas.height * 0.625;
 
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
+  // Shadow (keep subtle)
   ctx.shadowColor = "rgba(0,0,0,0.5)";
   ctx.shadowBlur = 8;
   ctx.shadowOffsetX = 3;
   ctx.shadowOffsetY = 3;
 
-  const x = canvas.width / 2;
-
-  // Slightly lower than before (you requested)
-  const y = canvas.height * 0.634;
-
   ctx.fillStyle = "#f5f5f5";
-  ctx.fillText(upperName, x, y);
+
+  // Start size
+  const startPx = Math.round(canvas.width * 0.095);
+  const minPx   = Math.round(canvas.width * 0.055);
+
+  // Try single-line first
+  const testFont = `900 ${startPx}px Impact`;
+  const singleWidth = measure(upperName, testFont);
+
+  if (singleWidth <= maxWidth){
+    drawFittedLine(upperName, x, baseY, maxWidth, startPx, minPx);
+  } else {
+    // If too long, split to 2 lines and fit each
+    const words = upperName.split(" ");
+    const lines = splitToTwoLines(words);
+
+    // Draw 2-line stacked name a touch lower spacing
+    // so it stays inside that name area
+    const lineGap = Math.round(canvas.width * 0.010);
+
+    // Fit first line and use that as ref size
+    const usedPx1 = drawFittedLine(lines[0], x, baseY - (startPx * 0.38), maxWidth, startPx, minPx);
+    const usedPx2 = drawFittedLine(lines[1], x, baseY + (usedPx1 * 0.55) + lineGap, maxWidth, usedPx1, minPx);
+  }
 
   ctx.shadowColor = "transparent";
 }
 
+/* ---------- DRAW DATE (BETTER BETWEEN LINES) ---------- */
 function drawDate(){
   const today = new Date();
   const dateString = today.toLocaleDateString("en-GB",{
@@ -144,28 +198,28 @@ function drawDate(){
     year:"numeric"
   });
 
-  const x = canvas.width / 2;
-
-  // Moved down to sit properly between white lines
-  const y = canvas.height * 0.935;
-
-  const fontSize = Math.max(16, Math.round(canvas.width * 0.018));
-  ctx.font = `700 ${fontSize}px Arial`;
-
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
-  ctx.shadowColor = "rgba(0,0,0,0.4)";
-  ctx.shadowBlur = 5;
+  // Slightly smaller + moved up to sit between the two white lines
+  const fontSize = Math.max(14, Math.round(canvas.width * 0.016));
+  ctx.font = `700 ${fontSize}px Arial`;
+  ctx.fillStyle = "#ffffff";
+
+  ctx.shadowColor = "rgba(0,0,0,0.35)";
+  ctx.shadowBlur = 4;
   ctx.shadowOffsetX = 2;
   ctx.shadowOffsetY = 2;
 
-  ctx.fillStyle = "#ffffff";
+  const x = canvas.width / 2;
+  const y = canvas.height * 0.922; // moved UP
+
   ctx.fillText(dateString, x, y);
 
   ctx.shadowColor = "transparent";
 }
 
+/* ---------- GENERATE / DOWNLOAD ---------- */
 function generateCertificate(){
   if(!imageLoaded){
     status.textContent = "Still loading certificate image…";
