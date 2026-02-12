@@ -1,66 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>THE RATTLESNAKE 10K CERTIFICATE</title>
 
 <style>
 body{
-  background:#111;
-  color:#fff;
+  margin:0;
+  background:#000;
   font-family:Arial, sans-serif;
+  color:white;
   text-align:center;
-  padding:20px;
 }
 
 h1{
-  font-size:32px;
-  font-weight:900;
-  margin-bottom:20px;
-  letter-spacing:1px;
+  margin-top:40px;
+  font-size:28px;
+  font-weight:700;
 }
 
 input{
+  width:70%;
   padding:14px;
-  font-size:18px;
-  width:90%;
-  max-width:520px;
-  border-radius:10px;
+  border-radius:12px;
   border:none;
-  margin-bottom:12px;
+  font-size:18px;
+  margin-top:20px;
 }
 
 button{
   display:block;
-  width:90%;
-  max-width:520px;
-  margin:10px auto;
+  width:70%;
+  margin:20px auto;
   padding:16px;
-  font-size:20px;
-  font-weight:800;
-  border-radius:14px;
+  background:#f59e0b;
   border:none;
-  background:#f39c12;
-  color:#000;
-  cursor:pointer;
+  border-radius:16px;
+  font-weight:700;
+  font-size:18px;
 }
 
-button:disabled{ opacity:0.5; cursor:not-allowed; }
-
 #status{
-  margin-top:14px;
-  font-size:14px;
-  opacity:0.85;
+  opacity:0.7;
+  margin-bottom:20px;
 }
 
 canvas{
-  margin-top:20px;
-  border:4px solid #f39c12;
-  border-radius:18px;
-  max-width:100%;
-  height:auto;
-  background:#222;
+  width:90%;
+  max-width:1000px;
+  border-radius:20px;
+  border:4px solid #f59e0b;
 }
 </style>
 </head>
@@ -69,163 +59,83 @@ canvas{
 
 <h1>THE RATTLESNAKE 10K CERTIFICATE</h1>
 
-<input id="nameInput" type="text" placeholder="Enter your name" />
+<input id="nameInput" placeholder="Enter your name">
 
-<button id="generateBtn">Generate Certificate</button>
-<button id="downloadBtn" disabled>Download Certificate</button>
+<button onclick="generateCertificate()">Generate Certificate</button>
+<button onclick="downloadCertificate()">Download Certificate</button>
 
-<div id="status">Loading certificate image…</div>
+<div id="status"></div>
 
-<canvas id="canvas"></canvas>
+<br>
+<canvas id="certificateCanvas"></canvas>
 
 <script>
-const canvas = document.getElementById("canvas");
+
+const canvas = document.getElementById("certificateCanvas");
 const ctx = canvas.getContext("2d");
 
-const nameInput = document.getElementById("nameInput");
-const generateBtn = document.getElementById("generateBtn");
-const downloadBtn = document.getElementById("downloadBtn");
-const status = document.getElementById("status");
+const background = new Image();
+background.src = "certificate-base.jpg"; // YOUR CERTIFICATE IMAGE FILE
 
-const certImage = new Image();
-certImage.src = "certificate.png";
-
-let imageLoaded = false;
-let hasGenerated = false;
-
-certImage.onload = () => {
-  imageLoaded = true;
-  canvas.width = certImage.naturalWidth;
-  canvas.height = certImage.naturalHeight;
-  ctx.drawImage(certImage, 0, 0);
-  status.textContent = "Ready. Enter your name and press Generate.";
-};
-
-certImage.onerror = () => {
-  status.textContent = "ERROR: certificate.png failed to load.";
-};
-
-/* ---------- HELPERS ---------- */
-function setImpact(sizePx){
-  ctx.font = `900 ${Math.round(sizePx)}px Impact`;
-}
-function textW(text){
-  return ctx.measureText(text).width;
+background.onload = function(){
+  canvas.width = background.width;
+  canvas.height = background.height;
+  ctx.drawImage(background,0,0);
 }
 
-/* ---------- NAME (FIXED PER YOUR NOTES) ----------
-   - Always ONE LINE
-   - Always CENTRED
-   - Auto shrink for long names
-   - Tiny move UP
---------------------------------------------------- */
-function drawName(name){
-  const upperName = String(name).toUpperCase().replace(/\s+/g," ").trim();
-
-  // TRUE centre of certificate (fixes "not central")
-  const x = canvas.width / 2;
-
-  // Tiny move UP (few pixels)
-  const y = canvas.height * 0.648;
-
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-
-  // Style
-  ctx.fillStyle = "#F5F5F5";
-  ctx.shadowColor = "rgba(0,0,0,0.45)";
-  ctx.shadowBlur = 7;
-  ctx.shadowOffsetX = 3;
-  ctx.shadowOffsetY = 3;
-
-  // Max width: keep inside the name band so it doesn't smash fox/edges
-  // (still centred — we just force the font to shrink to fit this width)
-  const maxWidth = canvas.width * 0.78;
-
-  // Start size slightly smaller than before (fixes "too big")
-  let size = canvas.width * 0.082;
-
-  // Minimum size so even very long names still appear (but small)
-  const minSize = canvas.width * 0.040;
-
-  // Fit loop (single line always)
-  setImpact(size);
-  while (textW(upperName) > maxWidth && size > minSize){
-    size -= 2;
-    setImpact(size);
-  }
-
-  ctx.fillText(upperName, x, y);
-
-  ctx.shadowColor = "transparent";
-}
-
-/* ---------- DATE (UNCHANGED) ---------- */
-function drawDate(){
-  const today = new Date();
-  const dateString = today.toLocaleDateString("en-GB",{
-    day:"2-digit",
-    month:"short",
-    year:"numeric"
-  });
-
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-
-  const fontSize = Math.max(14, Math.round(canvas.width * 0.016));
-  ctx.font = `700 ${fontSize}px Arial`;
-  ctx.fillStyle = "#ffffff";
-
-  ctx.shadowColor = "rgba(0,0,0,0.35)";
-  ctx.shadowBlur = 4;
-  ctx.shadowOffsetX = 2;
-  ctx.shadowOffsetY = 2;
-
-  const x = canvas.width / 2;
-  const y = canvas.height * 0.922; // untouched
-  ctx.fillText(dateString, x, y);
-
-  ctx.shadowColor = "transparent";
-}
-
-/* ---------- GENERATE / DOWNLOAD ---------- */
 function generateCertificate(){
-  if(!imageLoaded){
-    status.textContent = "Still loading certificate image…";
-    return;
-  }
 
-  const name = nameInput.value.trim();
-  if(!name){
-    status.textContent = "Enter your name first.";
-    return;
-  }
+  const name = document.getElementById("nameInput").value.trim();
+  if(!name) return;
 
   ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.drawImage(certImage,0,0);
+  ctx.drawImage(background,0,0);
 
-  drawName(name);
-  drawDate();
+  const upperName = name.toUpperCase();
 
-  hasGenerated = true;
-  downloadBtn.disabled = false;
-  status.textContent = "Certificate generated. Ready to download.";
+  // ===== NAME SETTINGS =====
+  const centerX = canvas.width / 2;
+
+  // DO NOT CHANGE THIS — placement locked
+  const nameY = canvas.height * 0.625;
+
+  // Smaller starting size so long names behave
+  let size = canvas.width * 0.075;
+
+  // More aggressive shrink width
+  const maxWidth = canvas.width * 0.68;
+
+  // Lower minimum so long names still fit
+  const minSize = canvas.width * 0.03;
+
+  function setFont(s){
+    ctx.font = `bold ${s}px Impact, Arial Black, sans-serif`;
+  }
+
+  setFont(size);
+
+  while(ctx.measureText(upperName).width > maxWidth && size > minSize){
+    size -= 2;
+    setFont(size);
+  }
+
+  ctx.fillStyle = "#E5E5E5";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+
+  ctx.fillText(upperName, centerX, nameY);
+
+  document.getElementById("status").innerText =
+    "Certificate generated. Ready to download.";
 }
 
 function downloadCertificate(){
-  if(!hasGenerated){
-    status.textContent = "Generate the certificate first.";
-    return;
-  }
-
   const link = document.createElement("a");
-  link.download = "WRW_Rattlesnake_10K_Certificate.png";
-  link.href = canvas.toDataURL("image/png");
+  link.download = "WRW-RATTLESNAKE-10K-CERTIFICATE.png";
+  link.href = canvas.toDataURL();
   link.click();
 }
 
-generateBtn.addEventListener("click", generateCertificate);
-downloadBtn.addEventListener("click", downloadCertificate);
 </script>
 
 </body>
