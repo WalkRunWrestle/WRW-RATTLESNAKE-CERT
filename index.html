@@ -11,35 +11,35 @@ body {
   color: #fff;
   font-family: Arial, sans-serif;
   text-align: center;
-  padding: 20px;
+  padding: 12px;              /* was 20px */
 }
 
 h1 {
-  margin-bottom: 10px;
+  margin: 0 0 6px 0;          /* tighter */
 }
 
-/* NEW: small sub line under title */
+/* small sub line under title */
 .subLine{
-  margin: 0 auto 14px auto;
+  margin: 0 auto 10px auto;   /* was 14px bottom */
   max-width: 720px;
   opacity: 0.92;
   font-size: 14px;
-  line-height: 1.35;
+  line-height: 1.25;          /* tighter */
 }
 
-/* NEW: gold boxed link (like tracker) */
+/* gold boxed link */
 .siteLink{
-  margin-top: 10px;
+  margin-top: 8px;            /* was 10px */
 }
 .siteLink a{
   display:inline-block;
-  padding:10px 14px;
-  border-radius:14px;
+  padding: 9px 12px;          /* was 10px 14px */
+  border-radius: 14px;
 
-  font-size:13px;
-  font-weight:900;
-  letter-spacing:1.8px;
-  text-transform:uppercase;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 1.6px;      /* slightly tighter */
+  text-transform: uppercase;
 
   color:#141418;
   text-decoration:none;
@@ -58,18 +58,18 @@ h1 {
 }
 @media (max-width:420px){
   .siteLink a{
-    width:min(360px, 86vw);
+    width:min(360px, 90vw);   /* slightly wider, looks less “floaty” */
     text-align:center;
-    padding:12px 16px;
-    font-size:14px;
+    padding: 10px 14px;       /* was 12px 16px */
+    font-size: 14px;
   }
 }
 
 input, button {
   padding: 12px;
   font-size: 18px;
-  margin: 6px;
-  border-radius: 6px;
+  margin: 4px;               /* was 6px */
+  border-radius: 10px;       /* slightly softer */
   border: none;
 }
 
@@ -84,15 +84,25 @@ button:disabled {
   cursor: not-allowed;
 }
 
-/* NEW: secondary button style (Clear) */
+/* secondary button style (Clear) */
 .secondaryBtn{
   background: #222;
   border: 2px solid #f39c12;
   color: #fff;
 }
 
+/* keep buttons looking tidy on phone */
+@media (max-width:420px){
+  input{
+    width: min(520px, 92vw);
+  }
+  button{
+    width: min(520px, 92vw);
+  }
+}
+
 canvas {
-  margin-top: 20px;
+  margin-top: 14px;          /* was 20px */
   border: 3px solid #f39c12;
   max-width: 100%;
   height: auto;
@@ -100,22 +110,23 @@ canvas {
 }
 
 #status {
-  margin-top: 12px;
+  margin-top: 8px;           /* was 12px */
   font-size: 14px;
   opacity: 0.9;
 }
 
-/* NEW: tip + long-name note */
+/* tip + long-name note */
 .tip{
-  margin-top: 8px;
+  margin-top: 6px;           /* was 8px */
   font-size: 13px;
   opacity: 0.9;
 }
+
 .note{
-  margin: 14px auto 0 auto;
+  margin: 10px auto 0 auto;  /* was 14px top */
   max-width: 720px;
   font-size: 13px;
-  line-height: 1.35;
+  line-height: 1.25;         /* tighter */
   opacity: 0.9;
 }
 .note a{
@@ -131,7 +142,6 @@ canvas {
 
 <h1>WRW RATTLESNAKE 10K CERTIFICATE</h1>
 
-<!-- NEW: congrats + next challenge + gold boxed website link -->
 <div class="subLine">
   Congrats on finishing the Rattlesnake 10K. Ready for your next challenge?
   <div class="siteLink">
@@ -139,7 +149,6 @@ canvas {
   </div>
 </div>
 
-<!-- UPDATED (2): better phone/name input behaviour -->
 <input
   id="nameInput"
   type="text"
@@ -153,18 +162,14 @@ canvas {
 
 <button id="generateBtn">Generate Certificate</button>
 <button id="downloadBtn" disabled>Download Certificate</button>
-
-<!-- NEW (3): clear button -->
 <button id="clearBtn" class="secondaryBtn" type="button">Clear</button>
 
-<!-- NEW (6): simple tip -->
 <div class="tip">Tip: press <b>Generate</b> to preview, then <b>Download</b>.</div>
 
 <div id="status">Loading certificate image…</div>
 
 <canvas id="canvas"></canvas>
 
-<!-- NEW: long-name note under certificate -->
 <div class="note">
   For some long names, formatting may vary slightly. If needed, contact us
   (<a href="mailto:contact@walkrunwrestle.com">contact@walkrunwrestle.com</a>) and we’ll issue a personalised version by email.
@@ -181,7 +186,7 @@ const clearBtn = document.getElementById("clearBtn");
 const status = document.getElementById("status");
 
 const certImage = new Image();
-certImage.src = "certificate.png";  // MUST match repo filename
+certImage.src = "certificate.png";
 
 let imageLoaded = false;
 let hasGenerated = false;
@@ -205,14 +210,12 @@ function redrawBase(){
 }
 
 function drawName(name) {
-
   const upperName = name.toUpperCase();
   const centerX = canvas.width / 2;
 
-  // 🔒 Placement locked — moved DOWN 4px
+  // 🔒 Placement locked
   const nameY = (canvas.height * 0.625) + 18;
 
-  // 15% smaller than original
   let size = Math.round(canvas.width * 0.066);
 
   const maxWidth = canvas.width * 0.68;
@@ -243,7 +246,6 @@ function drawName(name) {
   ctx.shadowColor = "transparent";
 }
 
-/* NEW: full date with ordinal (12th February 2026) */
 function getOrdinal(n){
   if (n > 3 && n < 21) return n + "th";
   switch (n % 10){
@@ -255,7 +257,6 @@ function getOrdinal(n){
 }
 
 function drawDate() {
-
   const today = new Date();
   const day = getOrdinal(today.getDate());
   const month = today.toLocaleString("en-GB", { month: "long" });
@@ -282,7 +283,6 @@ function drawDate() {
 }
 
 function generateCertificate() {
-
   if (!imageLoaded) {
     status.textContent = "Still loading certificate image…";
     return;
@@ -304,7 +304,6 @@ function generateCertificate() {
 }
 
 function downloadCertificate() {
-
   if (!hasGenerated) {
     status.textContent = "Generate the certificate first.";
     return;
@@ -316,7 +315,6 @@ function downloadCertificate() {
   link.click();
 }
 
-/* NEW (5): if name changes after generate, re-disable download until re-generate */
 nameInput.addEventListener("input", () => {
   if (!imageLoaded) return;
   if (hasGenerated){
@@ -326,7 +324,6 @@ nameInput.addEventListener("input", () => {
   }
 });
 
-/* NEW (3): clear/reset */
 function clearAll(){
   nameInput.value = "";
   hasGenerated = false;
