@@ -26,15 +26,22 @@ h1 {
   line-height: 1.35;
 }
 
+/* CHANGED: link box smaller + centred (and name input matches exactly) */
+:root{
+  --topBoxMax: 560px;  /* smaller than before (was 720px) */
+  --topBoxRadius: 14px;
+}
+
 .siteLink{
   margin-top: 10px;
 }
 .siteLink a{
-  display:inline-block;
+  display:block;
   width:100%;
-  max-width:720px;
+  max-width: var(--topBoxMax);
+  margin: 0 auto;
   padding:14px 18px;
-  border-radius:14px;
+  border-radius: var(--topBoxRadius);
   font-size:14px;
   font-weight:900;
   letter-spacing:1.8px;
@@ -48,13 +55,14 @@ h1 {
     0 0 18px rgba(230,184,74,.18);
 }
 
+/* CHANGED: name input matches link box size + centred */
 input {
   width:100%;
-  max-width:720px;
+  max-width: var(--topBoxMax);
+  margin:14px auto;
   padding:14px 18px;
   font-size:18px;
-  margin:14px auto;
-  border-radius:14px;
+  border-radius: var(--topBoxRadius);
   border:none;
   display:block;
 }
@@ -62,10 +70,9 @@ input {
 .buttonRow{
   display:flex;
   gap:12px;
-  max-width:720px;
+  max-width:560px;     /* keep button row aligned with the smaller boxes */
   margin:10px auto;
 }
-
 .buttonRow button{
   flex:1;
 }
@@ -95,7 +102,7 @@ button:disabled {
 
 .clearBtn{
   width:100%;
-  max-width:720px;
+  max-width:560px;
   margin:18px auto 0 auto;
   padding:14px;
   background:#222;
@@ -110,12 +117,6 @@ canvas {
   max-width: 100%;
   height: auto;
   background: #222;
-}
-
-.tip{
-  margin-top:8px;
-  font-size:13px;
-  opacity:0.9;
 }
 
 .note{
@@ -140,7 +141,7 @@ canvas {
 <div class="subLine">
   Congrats on finishing the Rattlesnake 10K. Ready for your next challenge?
   <div class="siteLink">
-    <a href="https://walkrunwrestle.com" target="_blank">WALKRUNWRESTLE.COM</a>
+    <a href="https://walkrunwrestle.com" target="_blank" rel="noopener">WALKRUNWRESTLE.COM</a>
   </div>
 </div>
 
@@ -202,6 +203,8 @@ function redrawBase(){
 function drawName(name){
   const upperName = name.toUpperCase();
   const centerX = canvas.width / 2;
+
+  // 🔒 placement unchanged
   const nameY = (canvas.height * 0.625) + 18;
 
   let size = Math.round(canvas.width * 0.066);
@@ -257,6 +260,7 @@ function drawDate(){
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
+  // 🔒 placement unchanged
   const x = canvas.width / 2;
   const y = canvas.height * 0.89;
 
@@ -300,3 +304,4 @@ clearBtn.addEventListener("click", clearAll);
 
 </body>
 </html>
+```0
