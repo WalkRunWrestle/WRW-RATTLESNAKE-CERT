@@ -26,72 +26,82 @@ h1 {
   line-height: 1.35;
 }
 
-/* Gold link button */
 .siteLink{
   margin-top: 10px;
 }
 .siteLink a{
   display:inline-block;
-  padding:12px 28px;
+  width:100%;
+  max-width:720px;
+  padding:14px 18px;
   border-radius:14px;
-
   font-size:14px;
   font-weight:900;
   letter-spacing:1.8px;
   text-transform:uppercase;
-
   color:#141418;
   text-decoration:none;
-
   background: linear-gradient(135deg, rgba(230,184,74,1), rgba(255,214,107,1), rgba(194,143,44,1));
   border:1px solid rgba(255,214,107,.95);
-
   box-shadow:
     0 12px 26px rgba(0,0,0,.55),
     0 0 18px rgba(230,184,74,.18);
-
-  transition: transform .15s ease, filter .15s ease;
-}
-.siteLink a:hover{
-  filter:brightness(1.06);
-  transform: translateY(-1px);
 }
 
 input {
   width:100%;
-  max-width:600px;
-  padding: 12px;
-  font-size: 18px;
-  margin: 12px auto;
-  border-radius: 6px;
-  border: none;
+  max-width:720px;
+  padding:14px 18px;
+  font-size:18px;
+  margin:14px auto;
+  border-radius:14px;
+  border:none;
   display:block;
 }
 
 .buttonRow{
   display:flex;
   gap:12px;
-  max-width:600px;
-  margin: 0 auto;
+  max-width:720px;
+  margin:10px auto;
 }
 
 .buttonRow button{
   flex:1;
+}
+
+button {
   padding:14px;
   font-size:18px;
-  border-radius:8px;
+  border-radius:14px;
   border:none;
   font-weight:bold;
+  cursor:pointer;
+}
+
+button:disabled {
+  opacity:0.5;
+  cursor:not-allowed;
 }
 
 .primaryBtn{
   background:#f39c12;
-  cursor:pointer;
 }
 
-.primaryBtn:disabled{
-  opacity:.5;
-  cursor:not-allowed;
+.secondaryBtn{
+  background:#8a5b12;
+  color:#111;
+}
+
+.clearBtn{
+  width:100%;
+  max-width:720px;
+  margin:18px auto 0 auto;
+  padding:14px;
+  background:#222;
+  border:2px solid #f39c12;
+  color:#fff;
+  border-radius:14px;
 }
 
 canvas {
@@ -102,28 +112,14 @@ canvas {
   background: #222;
 }
 
-.clearBtn{
-  margin:20px auto 0 auto;
-  display:block;
-  width:100%;
-  max-width:600px;
-  padding:14px;
-  font-size:18px;
-  border-radius:8px;
-  background:#222;
-  border:2px solid #f39c12;
-  color:#fff;
-  font-weight:bold;
-}
-
-#status {
-  margin-top: 12px;
-  font-size: 14px;
-  opacity: 0.9;
+.tip{
+  margin-top:8px;
+  font-size:13px;
+  opacity:0.9;
 }
 
 .note{
-  margin: 18px auto 0 auto;
+  margin: 14px auto 0 auto;
   max-width: 720px;
   font-size: 13px;
   line-height: 1.35;
@@ -133,13 +129,6 @@ canvas {
   color:#f39c12;
   text-decoration:none;
   font-weight:700;
-}
-.note a:hover{ text-decoration: underline; }
-
-@media(max-width:500px){
-  .buttonRow{
-    flex-direction:row;
-  }
 }
 </style>
 </head>
@@ -151,9 +140,7 @@ canvas {
 <div class="subLine">
   Congrats on finishing the Rattlesnake 10K. Ready for your next challenge?
   <div class="siteLink">
-    <a href="https://walkrunwrestle.com" target="_blank" rel="noopener">
-      WALKRUNWRESTLE.COM
-    </a>
+    <a href="https://walkrunwrestle.com" target="_blank">WALKRUNWRESTLE.COM</a>
   </div>
 </div>
 
@@ -168,10 +155,10 @@ canvas {
 
 <div class="buttonRow">
   <button id="generateBtn" class="primaryBtn">Generate</button>
-  <button id="downloadBtn" class="primaryBtn" disabled>Download</button>
+  <button id="downloadBtn" class="secondaryBtn" disabled>Download</button>
 </div>
 
-<div id="status">Loading certificate image…</div>
+<div id="status"></div>
 
 <canvas id="canvas"></canvas>
 
@@ -204,7 +191,6 @@ certImage.onload = () => {
   canvas.width = certImage.naturalWidth;
   canvas.height = certImage.naturalHeight;
   ctx.drawImage(certImage, 0, 0);
-  status.textContent = "Ready.";
 };
 
 function redrawBase(){
@@ -213,8 +199,7 @@ function redrawBase(){
   ctx.drawImage(certImage,0,0);
 }
 
-function drawName(name) {
-
+function drawName(name){
   const upperName = name.toUpperCase();
   const centerX = canvas.width / 2;
   const nameY = (canvas.height * 0.625) + 18;
@@ -229,7 +214,7 @@ function drawName(name) {
 
   setFont(size);
 
-  while (ctx.measureText(upperName).width > maxWidth && size > minSize) {
+  while (ctx.measureText(upperName).width > maxWidth && size > minSize){
     size -= 2;
     setFont(size);
   }
@@ -244,43 +229,45 @@ function drawName(name) {
   ctx.shadowOffsetY = 3;
 
   ctx.fillText(upperName, centerX, nameY);
+
   ctx.shadowColor = "transparent";
 }
 
-function drawDate() {
-
+function drawDate(){
   const today = new Date();
-  const dateString = today.toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric"
-  });
+
+  function getOrdinal(n){
+    if (n>3 && n<21) return "th";
+    switch(n%10){
+      case 1:return "st";
+      case 2:return "nd";
+      case 3:return "rd";
+      default:return "th";
+    }
+  }
+
+  const day = today.getDate();
+  const month = today.toLocaleString("en-GB",{month:"long"});
+  const year = today.getFullYear();
+
+  const dateString = `${day}${getOrdinal(day)} ${month} ${year}`;
 
   ctx.font = "36px Arial";
   ctx.fillStyle = "#ffffff";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
-  ctx.shadowColor = "rgba(0,0,0,0.35)";
-  ctx.shadowBlur = 4;
-  ctx.shadowOffsetX = 2;
-  ctx.shadowOffsetY = 2;
-
   const x = canvas.width / 2;
   const y = canvas.height * 0.89;
 
   ctx.fillText(dateString, x, y);
-  ctx.shadowColor = "transparent";
 }
 
 function generateCertificate(){
-  if(!imageLoaded) return;
+  if (!imageLoaded) return;
 
   const name = nameInput.value.trim();
-  if(!name){
-    status.textContent = "Enter your name first.";
-    return;
-  }
+  if (!name) return;
 
   redrawBase();
   drawName(name);
@@ -288,11 +275,10 @@ function generateCertificate(){
 
   hasGenerated = true;
   downloadBtn.disabled = false;
-  status.textContent = "Certificate generated.";
 }
 
 function downloadCertificate(){
-  if(!hasGenerated) return;
+  if (!hasGenerated) return;
 
   const link = document.createElement("a");
   link.download = "WRW_RATTLESNAKE_10K_CERTIFICATE.png";
@@ -310,7 +296,6 @@ function clearAll(){
 generateBtn.addEventListener("click", generateCertificate);
 downloadBtn.addEventListener("click", downloadCertificate);
 clearBtn.addEventListener("click", clearAll);
-
 </script>
 
 </body>
