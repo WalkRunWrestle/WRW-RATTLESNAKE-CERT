@@ -18,7 +18,6 @@ h1 {
   margin-bottom: 10px;
 }
 
-/* small sub line under title */
 .subLine{
   margin: 0 auto 14px auto;
   max-width: 720px;
@@ -27,16 +26,16 @@ h1 {
   line-height: 1.35;
 }
 
-/* gold boxed link */
+/* Gold link button */
 .siteLink{
   margin-top: 10px;
 }
 .siteLink a{
   display:inline-block;
-  padding:10px 14px;
+  padding:12px 28px;
   border-radius:14px;
 
-  font-size:13px;
+  font-size:14px;
   font-weight:900;
   letter-spacing:1.8px;
   text-transform:uppercase;
@@ -50,6 +49,7 @@ h1 {
   box-shadow:
     0 12px 26px rgba(0,0,0,.55),
     0 0 18px rgba(230,184,74,.18);
+
   transition: transform .15s ease, filter .15s ease;
 }
 .siteLink a:hover{
@@ -57,71 +57,73 @@ h1 {
   transform: translateY(-1px);
 }
 
-input, button {
+input {
+  width:100%;
+  max-width:600px;
   padding: 12px;
   font-size: 18px;
-  margin: 6px;
+  margin: 12px auto;
   border-radius: 6px;
   border: none;
-  box-sizing: border-box;
+  display:block;
 }
 
-button {
-  background: #f39c12;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* secondary button style (Clear) */
-.secondaryBtn{
-  background: #222;
-  border: 2px solid #f39c12;
-  color: #fff;
-}
-
-/* ✅ NEW: full-width control sizing on phones (everything lines up) */
-.controls{
-  width: min(520px, 92vw);
-  margin: 0 auto;
-}
-.controls input{
-  width: 100%;
-  margin-left: 0;
-  margin-right: 0;
-}
-.controls .siteLink a{
-  width: 100%;
-  margin-left: 0;
-  margin-right: 0;
-  text-align: center;
-}
 .buttonRow{
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  width: 100%;
+  display:flex;
+  gap:12px;
+  max-width:600px;
   margin: 0 auto;
 }
+
 .buttonRow button{
-  flex: 1;
-  width: 50%;
-  margin-left: 0;
-  margin-right: 0;
+  flex:1;
+  padding:14px;
+  font-size:18px;
+  border-radius:8px;
+  border:none;
+  font-weight:bold;
 }
 
-/* Tip + long-name note */
-.tip{
-  margin-top: 8px;
-  font-size: 13px;
+.primaryBtn{
+  background:#f39c12;
+  cursor:pointer;
+}
+
+.primaryBtn:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+}
+
+canvas {
+  margin-top: 20px;
+  border: 3px solid #f39c12;
+  max-width: 100%;
+  height: auto;
+  background: #222;
+}
+
+.clearBtn{
+  margin:20px auto 0 auto;
+  display:block;
+  width:100%;
+  max-width:600px;
+  padding:14px;
+  font-size:18px;
+  border-radius:8px;
+  background:#222;
+  border:2px solid #f39c12;
+  color:#fff;
+  font-weight:bold;
+}
+
+#status {
+  margin-top: 12px;
+  font-size: 14px;
   opacity: 0.9;
 }
+
 .note{
-  margin: 14px auto 0 auto;
+  margin: 18px auto 0 auto;
   max-width: 720px;
   font-size: 13px;
   line-height: 1.35;
@@ -134,18 +136,10 @@ button:disabled {
 }
 .note a:hover{ text-decoration: underline; }
 
-canvas {
-  margin-top: 20px;
-  border: 3px solid #f39c12;
-  max-width: 100%;
-  height: auto;
-  background: #222;
-}
-
-#status {
-  margin-top: 12px;
-  font-size: 14px;
-  opacity: 0.9;
+@media(max-width:500px){
+  .buttonRow{
+    flex-direction:row;
+  }
 }
 </style>
 </head>
@@ -156,45 +150,37 @@ canvas {
 
 <div class="subLine">
   Congrats on finishing the Rattlesnake 10K. Ready for your next challenge?
-</div>
-
-<div class="controls">
-
   <div class="siteLink">
-    <a href="https://walkrunwrestle.com" target="_blank" rel="noopener">VISIT WALKRUNWRESTLE.COM →</a>
+    <a href="https://walkrunwrestle.com" target="_blank" rel="noopener">
+      WALKRUNWRESTLE.COM
+    </a>
   </div>
-
-  <input
-    id="nameInput"
-    type="text"
-    placeholder="Enter your name"
-    autocomplete="name"
-    autocapitalize="words"
-    spellcheck="false"
-  />
-
-  <!-- ✅ Generate + Download on one row, same width, fills line -->
-  <div class="buttonRow">
-    <button id="generateBtn">Generate</button>
-    <button id="downloadBtn" disabled>Download</button>
-  </div>
-
 </div>
 
-<div class="tip">Tip: press <b>Generate</b> to preview, then <b>Download</b>.</div>
+<input
+  id="nameInput"
+  type="text"
+  placeholder="Enter your name"
+  autocomplete="name"
+  autocapitalize="words"
+  spellcheck="false"
+/>
+
+<div class="buttonRow">
+  <button id="generateBtn" class="primaryBtn">Generate</button>
+  <button id="downloadBtn" class="primaryBtn" disabled>Download</button>
+</div>
 
 <div id="status">Loading certificate image…</div>
 
 <canvas id="canvas"></canvas>
 
-<!-- ✅ Clear moved under picture, full width, above email note -->
-<div class="controls">
-  <button id="clearBtn" class="secondaryBtn" type="button" style="width:100%; margin: 10px 0 0 0;">Clear</button>
-</div>
+<button id="clearBtn" class="clearBtn">Clear</button>
 
 <div class="note">
   For some long names, formatting may vary slightly. If needed, contact us
-  (<a href="mailto:contact@walkrunwrestle.com">contact@walkrunwrestle.com</a>) and we’ll issue a personalised version by email.
+  (<a href="mailto:contact@walkrunwrestle.com">contact@walkrunwrestle.com</a>)
+  and we’ll issue a personalised version by email.
 </div>
 
 <script>
@@ -208,7 +194,7 @@ const clearBtn = document.getElementById("clearBtn");
 const status = document.getElementById("status");
 
 const certImage = new Image();
-certImage.src = "certificate.png";  // MUST match repo filename
+certImage.src = "certificate.png";
 
 let imageLoaded = false;
 let hasGenerated = false;
@@ -218,29 +204,22 @@ certImage.onload = () => {
   canvas.width = certImage.naturalWidth;
   canvas.height = certImage.naturalHeight;
   ctx.drawImage(certImage, 0, 0);
-  status.textContent = "YOUR RUN, YOUR WAY.";
-};
-
-certImage.onerror = () => {
-  status.textContent = "ERROR: certificate.png failed to load.";
+  status.textContent = "Ready.";
 };
 
 function redrawBase(){
   if (!imageLoaded) return;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.drawImage(certImage, 0, 0);
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.drawImage(certImage,0,0);
 }
 
 function drawName(name) {
+
   const upperName = name.toUpperCase();
   const centerX = canvas.width / 2;
-
-  // 🔒 Placement locked
   const nameY = (canvas.height * 0.625) + 18;
 
-  // 15% smaller than original
   let size = Math.round(canvas.width * 0.066);
-
   const maxWidth = canvas.width * 0.68;
   const minSize = Math.round(canvas.width * 0.03);
 
@@ -265,11 +244,11 @@ function drawName(name) {
   ctx.shadowOffsetY = 3;
 
   ctx.fillText(upperName, centerX, nameY);
-
   ctx.shadowColor = "transparent";
 }
 
 function drawDate() {
+
   const today = new Date();
   const dateString = today.toLocaleDateString("en-GB", {
     day: "numeric",
@@ -287,23 +266,18 @@ function drawDate() {
   ctx.shadowOffsetX = 2;
   ctx.shadowOffsetY = 2;
 
-  // 🔒 DATE POSITION UNCHANGED
   const x = canvas.width / 2;
   const y = canvas.height * 0.89;
 
   ctx.fillText(dateString, x, y);
-
   ctx.shadowColor = "transparent";
 }
 
-function generateCertificate() {
-  if (!imageLoaded) {
-    status.textContent = "Still loading certificate image…";
-    return;
-  }
+function generateCertificate(){
+  if(!imageLoaded) return;
 
   const name = nameInput.value.trim();
-  if (!name) {
+  if(!name){
     status.textContent = "Enter your name first.";
     return;
   }
@@ -314,14 +288,11 @@ function generateCertificate() {
 
   hasGenerated = true;
   downloadBtn.disabled = false;
-  status.textContent = "Certificate generated. Ready to download.";
+  status.textContent = "Certificate generated.";
 }
 
-function downloadCertificate() {
-  if (!hasGenerated) {
-    status.textContent = "Generate the certificate first.";
-    return;
-  }
+function downloadCertificate(){
+  if(!hasGenerated) return;
 
   const link = document.createElement("a");
   link.download = "WRW_RATTLESNAKE_10K_CERTIFICATE.png";
@@ -329,35 +300,18 @@ function downloadCertificate() {
   link.click();
 }
 
-/* If name changes after generate, re-disable download until re-generate */
-nameInput.addEventListener("input", () => {
-  if (!imageLoaded) return;
-  if (hasGenerated){
-    hasGenerated = false;
-    downloadBtn.disabled = true;
-    status.textContent = "Name changed — press Generate again.";
-  }
-});
-
-/* Clear/reset */
 function clearAll(){
-  nameInput.value = "";
-  hasGenerated = false;
-  downloadBtn.disabled = true;
-
-  if (imageLoaded){
-    redrawBase();
-    status.textContent = "Cleared. Enter your name and press Generate.";
-  } else {
-    status.textContent = "Loading certificate image…";
-  }
+  nameInput.value="";
+  hasGenerated=false;
+  downloadBtn.disabled=true;
+  redrawBase();
 }
 
 generateBtn.addEventListener("click", generateCertificate);
 downloadBtn.addEventListener("click", downloadCertificate);
 clearBtn.addEventListener("click", clearAll);
+
 </script>
 
 </body>
 </html>
-```0
