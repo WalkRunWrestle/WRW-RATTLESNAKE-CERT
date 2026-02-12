@@ -18,7 +18,7 @@ h1 {
   margin-bottom: 10px;
 }
 
-/* NEW: small sub line under title */
+/* small sub line under title */
 .subLine{
   margin: 0 auto 14px auto;
   max-width: 720px;
@@ -27,7 +27,7 @@ h1 {
   line-height: 1.35;
 }
 
-/* NEW: gold boxed link (like tracker) */
+/* gold boxed link */
 .siteLink{
   margin-top: 10px;
 }
@@ -56,14 +56,6 @@ h1 {
   filter:brightness(1.06);
   transform: translateY(-1px);
 }
-@media (max-width:420px){
-  .siteLink a{
-    width:min(360px, 86vw);
-    text-align:center;
-    padding:12px 16px;
-    font-size:14px;
-  }
-}
 
 input, button {
   padding: 12px;
@@ -85,53 +77,44 @@ button:disabled {
   cursor: not-allowed;
 }
 
-/* NEW: secondary button style (Clear) */
+/* secondary button style (Clear) */
 .secondaryBtn{
   background: #222;
   border: 2px solid #f39c12;
   color: #fff;
 }
 
-/* NEW: button row layout (Generate + Download same row, equal size) */
+/* ✅ NEW: full-width control sizing on phones (everything lines up) */
+.controls{
+  width: min(520px, 92vw);
+  margin: 0 auto;
+}
+.controls input{
+  width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+}
+.controls .siteLink a{
+  width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+  text-align: center;
+}
 .buttonRow{
   display: flex;
-  gap: 8px;
+  gap: 10px;
   justify-content: center;
-  flex-wrap: wrap;
+  width: 100%;
+  margin: 0 auto;
 }
-
 .buttonRow button{
   flex: 1;
-  max-width: 260px;
+  width: 50%;
+  margin-left: 0;
+  margin-right: 0;
 }
 
-/* Mobile tighten */
-@media (max-width:420px){
-  .buttonRow{
-    width: min(520px, 92vw);
-    margin: 0 auto;
-  }
-
-  .buttonRow button{
-    max-width: none;
-  }
-}
-
-canvas {
-  margin-top: 20px;
-  border: 3px solid #f39c12;
-  max-width: 100%;
-  height: auto;
-  background: #222;
-}
-
-#status {
-  margin-top: 12px;
-  font-size: 14px;
-  opacity: 0.9;
-}
-
-/* NEW: tip + long-name note */
+/* Tip + long-name note */
 .tip{
   margin-top: 8px;
   font-size: 13px;
@@ -150,6 +133,20 @@ canvas {
   font-weight:700;
 }
 .note a:hover{ text-decoration: underline; }
+
+canvas {
+  margin-top: 20px;
+  border: 3px solid #f39c12;
+  max-width: 100%;
+  height: auto;
+  background: #222;
+}
+
+#status {
+  margin-top: 12px;
+  font-size: 14px;
+  opacity: 0.9;
+}
 </style>
 </head>
 
@@ -157,43 +154,44 @@ canvas {
 
 <h1>WRW RATTLESNAKE 10K CERTIFICATE</h1>
 
-<!-- NEW: congrats + next challenge + gold boxed website link -->
 <div class="subLine">
   Congrats on finishing the Rattlesnake 10K. Ready for your next challenge?
+</div>
+
+<div class="controls">
+
   <div class="siteLink">
     <a href="https://walkrunwrestle.com" target="_blank" rel="noopener">VISIT WALKRUNWRESTLE.COM →</a>
   </div>
+
+  <input
+    id="nameInput"
+    type="text"
+    placeholder="Enter your name"
+    autocomplete="name"
+    autocapitalize="words"
+    spellcheck="false"
+  />
+
+  <!-- ✅ Generate + Download on one row, same width, fills line -->
+  <div class="buttonRow">
+    <button id="generateBtn">Generate</button>
+    <button id="downloadBtn" disabled>Download</button>
+  </div>
+
 </div>
 
-<!-- UPDATED: better phone/name input behaviour -->
-<input
-  id="nameInput"
-  type="text"
-  placeholder="Enter your name"
-  autocomplete="name"
-  autocapitalize="words"
-  spellcheck="false"
-/>
-
-<br>
-
-<!-- UPDATED: Generate + Download same row, same size -->
-<div class="buttonRow">
-  <button id="generateBtn">Generate</button>
-  <button id="downloadBtn" disabled>Download</button>
-</div>
-
-<!-- Clear stays full width below -->
-<button id="clearBtn" class="secondaryBtn" type="button">Clear</button>
-
-<!-- Tip -->
 <div class="tip">Tip: press <b>Generate</b> to preview, then <b>Download</b>.</div>
 
 <div id="status">Loading certificate image…</div>
 
 <canvas id="canvas"></canvas>
 
-<!-- Long-name note under certificate -->
+<!-- ✅ Clear moved under picture, full width, above email note -->
+<div class="controls">
+  <button id="clearBtn" class="secondaryBtn" type="button" style="width:100%; margin: 10px 0 0 0;">Clear</button>
+</div>
+
 <div class="note">
   For some long names, formatting may vary slightly. If needed, contact us
   (<a href="mailto:contact@walkrunwrestle.com">contact@walkrunwrestle.com</a>) and we’ll issue a personalised version by email.
@@ -234,7 +232,6 @@ function redrawBase(){
 }
 
 function drawName(name) {
-
   const upperName = name.toUpperCase();
   const centerX = canvas.width / 2;
 
@@ -273,7 +270,6 @@ function drawName(name) {
 }
 
 function drawDate() {
-
   const today = new Date();
   const dateString = today.toLocaleDateString("en-GB", {
     day: "numeric",
@@ -301,7 +297,6 @@ function drawDate() {
 }
 
 function generateCertificate() {
-
   if (!imageLoaded) {
     status.textContent = "Still loading certificate image…";
     return;
@@ -323,7 +318,6 @@ function generateCertificate() {
 }
 
 function downloadCertificate() {
-
   if (!hasGenerated) {
     status.textContent = "Generate the certificate first.";
     return;
@@ -366,3 +360,4 @@ clearBtn.addEventListener("click", clearAll);
 
 </body>
 </html>
+```0
