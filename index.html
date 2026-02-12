@@ -109,7 +109,7 @@
     nameInput.addEventListener("input", () => {
       nameInput.value = nameInput.value
         .toUpperCase()
-        .replace(/\s+/g, " "); // collapse multiple spaces
+        .replace(/\s+/g, " ");
     });
 
     // Enter to generate (phone-friendly)
@@ -133,20 +133,9 @@
     };
 
     function clearAndRedrawBase(){
+      ctx.setTransform(1,0,0,1,0,0);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(certImage, 0, 0);
-    }
-
-    // Fit text into a max width by shrinking font size
-    function fitFontSize(text, maxWidth, startPx, minPx){
-      let size = startPx;
-      while (size > minPx){
-        ctx.font = `900 ${size}px Impact, Arial Black, Arial, sans-serif`;
-        const w = ctx.measureText(text).width;
-        if (w <= maxWidth) return size;
-        size -= 2;
-      }
-      return minPx;
     }
 
     function sanitizeName(raw){
@@ -156,33 +145,66 @@
         .toUpperCase();
     }
 
+    // Fit text inside a rectangle by shrinking font size until it fits width + height
+    function fitTextToBox(text, boxW, boxH, startPx, minPx, fontStack){
+      let size = startPx;
+      while (size >= minPx){
+        ctx.font = `900 ${size}px ${fontStack}`;
+        const m = ctx.measureText(text);
+
+        // modern browsers give these (Chrome does)
+        const textH = (m.actualBoundingBoxAscent && m.actualBoundingBoxDescent)
+          ? (m.actualBoundingBoxAscent + m.actualBoundingBoxDescent)
+          : size; // fallback
+
+        const textW = m.width;
+
+        if (textW <= boxW && textH <= boxH) return size;
+        size -= 2;
+      }
+      return minPx;
+    }
+
     function drawName(name) {
       const upperName = sanitizeName(name);
 
-      // --- NAME AREA TUNING ---
-      // Keep it inside the "AWARDED TO" band area
-      const x = canvas.width / 2;
-      const y = canvas.height * 0.655;              // moved slightly UP vs your broken one
-      const maxWidth = canvas.width * 0.66;         // safe width inside bars
+      // ✅ NAME "BAND" on your certificate:
+      // This is the gap between the line under AWARDED TO and the line above "FOR SUCCESSFULLY COMPLETING".
+      // Adjust these 4 numbers if you ever change the artwork.
+      const box = {
+        x: canvas.width * 0.20,
+        y: canvas.height * 0.545,   // <-- moved UP a lot vs your broken one
+        w: canvas.width * 0.60,
+        h: canvas.height * 0.105    // height of the allowed name band
+      };
 
-      // Start size based on canvas width, but clamp it
-      const startSize = Math.round(canvas.width * 0.11); // strong but not stupid
-      const minSize = 46;
+      const x = box.x + (box.w / 2);
+      const y = box.y + (box.h / 2);
 
-      const finalSize = fitFontSize(upperName, maxWidth, startSize, minSize);
+      // Use a shorter, cleaner heavy font (Impact is too tall here)
+      const fontStack = `"Arial Black", "Helvetica Neue", Arial, sans-serif`;
+
+      // Start big but not insane, then fit down
+      const startSize = Math.round(canvas.width * 0.10);
+      const minSize = 42;
+
+      const finalSize = fitTextToBox(upperName, box.w, box.h, startSize, minSize, fontStack);
 
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
+      ctx.font = `900 ${finalSize}px ${fontStack}`;
 
-      // Shadow (subtle)
+      // Subtle shadow (not the chunky mess)
       ctx.shadowColor = "rgba(0,0,0,0.55)";
       ctx.shadowBlur = 10;
       ctx.shadowOffsetX = 2;
       ctx.shadowOffsetY = 3;
 
-      // Outline then fill (cleaner on smoke)
-      ctx.font = `900 ${finalSize}px Impact, Arial Black, Arial, sans-serif`;
-      ctx.lineWidth = Math.max(6, Math.round(finalSize * 0.09));
+      // Outline + fill for readability on smoke
+      ctx.lineJoin = "round";
+      ctx.miterLimit = 2;
+
+      ctx.lineWidth = Math.max(4, Math.round(finalSize * 0.07));
       ctx.strokeStyle = "rgba(0,0,0,0.85)";
       ctx.strokeText(upperName, x, y);
 
