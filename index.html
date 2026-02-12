@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>THE RATTLESNAKE 10K CERTIFICATE</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>THE RATTLESNAKE 10K CERTIFICATE</title>
 
 <style>
-body {
+body{
   background:#111;
   color:#fff;
   font-family:Arial, sans-serif;
@@ -15,10 +15,8 @@ body {
 }
 
 h1{
-  font-size:34px;
+  font-size:32px;
   font-weight:900;
-  letter-spacing:2px;
-  text-transform:uppercase;
   margin-bottom:20px;
 }
 
@@ -26,44 +24,44 @@ input{
   padding:14px;
   font-size:18px;
   width:90%;
-  max-width:420px;
+  max-width:400px;
   border-radius:10px;
   border:none;
-  margin-bottom:14px;
+  margin-bottom:12px;
 }
 
 button{
+  display:block;
   width:90%;
-  max-width:420px;
+  max-width:400px;
+  margin:10px auto;
   padding:16px;
-  font-size:18px;
-  font-weight:900;
-  border-radius:12px;
+  font-size:20px;
+  font-weight:800;
+  border-radius:14px;
   border:none;
-  margin:8px 0;
-  cursor:pointer;
   background:#f39c12;
   color:#000;
+  cursor:pointer;
 }
 
 button:disabled{
-  opacity:.5;
-  cursor:not-allowed;
+  opacity:0.5;
+}
+
+#status{
+  margin-top:14px;
+  font-size:14px;
+  opacity:0.85;
 }
 
 canvas{
   margin-top:20px;
   border:4px solid #f39c12;
-  border-radius:14px;
+  border-radius:18px;
   max-width:100%;
   height:auto;
   background:#222;
-}
-
-#status{
-  margin-top:12px;
-  font-size:14px;
-  opacity:.85;
 }
 </style>
 </head>
@@ -108,37 +106,36 @@ certImage.onerror = () => {
   status.textContent = "ERROR: certificate.png failed to load.";
 };
 
-/* NAME */
 function drawName(name){
   const upperName = name.toUpperCase();
-  const x = canvas.width / 2;
 
-  // ✅ slight DOWN
-  const y = canvas.height * 0.632;
+  let fontSize = Math.round(canvas.width * 0.095);
+  ctx.font = `900 ${fontSize}px Impact`;
 
-  let fontSize = Math.round(canvas.width * 0.08);
-  ctx.font = `900 ${fontSize}px Arial`;
-
-  while(ctx.measureText(upperName).width > canvas.width * 0.75){
+  while(ctx.measureText(upperName).width > canvas.width * 0.8){
     fontSize -= 2;
-    ctx.font = `900 ${fontSize}px Arial`;
+    ctx.font = `900 ${fontSize}px Impact`;
   }
 
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
-  ctx.shadowColor = "rgba(0,0,0,0.6)";
+  ctx.shadowColor = "rgba(0,0,0,0.5)";
   ctx.shadowBlur = 8;
   ctx.shadowOffsetX = 3;
   ctx.shadowOffsetY = 3;
 
-  ctx.fillStyle = "#ffffff";
+  const x = canvas.width / 2;
+
+  // Slightly lower than before (you requested)
+  const y = canvas.height * 0.634;
+
+  ctx.fillStyle = "#f5f5f5";
   ctx.fillText(upperName, x, y);
 
   ctx.shadowColor = "transparent";
 }
 
-/* DATE */
 function drawDate(){
   const today = new Date();
   const dateString = today.toLocaleDateString("en-GB",{
@@ -149,10 +146,10 @@ function drawDate(){
 
   const x = canvas.width / 2;
 
-  // ✅ slight UP
-  const y = canvas.height * 0.928;
+  // Moved down to sit properly between white lines
+  const y = canvas.height * 0.935;
 
-  const fontSize = Math.max(18, Math.round(canvas.width * 0.020));
+  const fontSize = Math.max(16, Math.round(canvas.width * 0.018));
   ctx.font = `700 ${fontSize}px Arial`;
 
   ctx.textAlign = "center";
@@ -199,7 +196,7 @@ function downloadCertificate(){
   }
 
   const link = document.createElement("a");
-  link.download = "THE_RATTLESNAKE_10K_CERTIFICATE.png";
+  link.download = "WRW_Rattlesnake_10K_Certificate.png";
   link.href = canvas.toDataURL("image/png");
   link.click();
 }
