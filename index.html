@@ -11,35 +11,35 @@ body {
   color: #fff;
   font-family: Arial, sans-serif;
   text-align: center;
-  padding: 12px;              /* was 20px */
+  padding: 20px;
 }
 
 h1 {
-  margin: 0 0 6px 0;          /* tighter */
+  margin-bottom: 10px;
 }
 
-/* small sub line under title */
+/* NEW: small sub line under title */
 .subLine{
-  margin: 0 auto 10px auto;   /* was 14px bottom */
+  margin: 0 auto 14px auto;
   max-width: 720px;
   opacity: 0.92;
   font-size: 14px;
-  line-height: 1.25;          /* tighter */
+  line-height: 1.35;
 }
 
-/* gold boxed link */
+/* NEW: gold boxed link (like tracker) */
 .siteLink{
-  margin-top: 8px;            /* was 10px */
+  margin-top: 10px;
 }
 .siteLink a{
   display:inline-block;
-  padding: 9px 12px;          /* was 10px 14px */
-  border-radius: 14px;
+  padding:10px 14px;
+  border-radius:14px;
 
-  font-size: 13px;
-  font-weight: 900;
-  letter-spacing: 1.6px;      /* slightly tighter */
-  text-transform: uppercase;
+  font-size:13px;
+  font-weight:900;
+  letter-spacing:1.8px;
+  text-transform:uppercase;
 
   color:#141418;
   text-decoration:none;
@@ -58,19 +58,20 @@ h1 {
 }
 @media (max-width:420px){
   .siteLink a{
-    width:min(360px, 90vw);   /* slightly wider, looks less “floaty” */
+    width:min(360px, 86vw);
     text-align:center;
-    padding: 10px 14px;       /* was 12px 16px */
-    font-size: 14px;
+    padding:12px 16px;
+    font-size:14px;
   }
 }
 
 input, button {
   padding: 12px;
   font-size: 18px;
-  margin: 4px;               /* was 6px */
-  border-radius: 10px;       /* slightly softer */
+  margin: 6px;
+  border-radius: 6px;
   border: none;
+  box-sizing: border-box;
 }
 
 button {
@@ -84,25 +85,40 @@ button:disabled {
   cursor: not-allowed;
 }
 
-/* secondary button style (Clear) */
+/* NEW: secondary button style (Clear) */
 .secondaryBtn{
   background: #222;
   border: 2px solid #f39c12;
   color: #fff;
 }
 
-/* keep buttons looking tidy on phone */
+/* NEW: button row layout (Generate + Download same row, equal size) */
+.buttonRow{
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.buttonRow button{
+  flex: 1;
+  max-width: 260px;
+}
+
+/* Mobile tighten */
 @media (max-width:420px){
-  input{
+  .buttonRow{
     width: min(520px, 92vw);
+    margin: 0 auto;
   }
-  button{
-    width: min(520px, 92vw);
+
+  .buttonRow button{
+    max-width: none;
   }
 }
 
 canvas {
-  margin-top: 14px;          /* was 20px */
+  margin-top: 20px;
   border: 3px solid #f39c12;
   max-width: 100%;
   height: auto;
@@ -110,23 +126,22 @@ canvas {
 }
 
 #status {
-  margin-top: 8px;           /* was 12px */
+  margin-top: 12px;
   font-size: 14px;
   opacity: 0.9;
 }
 
-/* tip + long-name note */
+/* NEW: tip + long-name note */
 .tip{
-  margin-top: 6px;           /* was 8px */
+  margin-top: 8px;
   font-size: 13px;
   opacity: 0.9;
 }
-
 .note{
-  margin: 10px auto 0 auto;  /* was 14px top */
+  margin: 14px auto 0 auto;
   max-width: 720px;
   font-size: 13px;
-  line-height: 1.25;         /* tighter */
+  line-height: 1.35;
   opacity: 0.9;
 }
 .note a{
@@ -142,6 +157,7 @@ canvas {
 
 <h1>WRW RATTLESNAKE 10K CERTIFICATE</h1>
 
+<!-- NEW: congrats + next challenge + gold boxed website link -->
 <div class="subLine">
   Congrats on finishing the Rattlesnake 10K. Ready for your next challenge?
   <div class="siteLink">
@@ -149,6 +165,7 @@ canvas {
   </div>
 </div>
 
+<!-- UPDATED: better phone/name input behaviour -->
 <input
   id="nameInput"
   type="text"
@@ -160,16 +177,23 @@ canvas {
 
 <br>
 
-<button id="generateBtn">Generate Certificate</button>
-<button id="downloadBtn" disabled>Download Certificate</button>
+<!-- UPDATED: Generate + Download same row, same size -->
+<div class="buttonRow">
+  <button id="generateBtn">Generate</button>
+  <button id="downloadBtn" disabled>Download</button>
+</div>
+
+<!-- Clear stays full width below -->
 <button id="clearBtn" class="secondaryBtn" type="button">Clear</button>
 
+<!-- Tip -->
 <div class="tip">Tip: press <b>Generate</b> to preview, then <b>Download</b>.</div>
 
 <div id="status">Loading certificate image…</div>
 
 <canvas id="canvas"></canvas>
 
+<!-- Long-name note under certificate -->
 <div class="note">
   For some long names, formatting may vary slightly. If needed, contact us
   (<a href="mailto:contact@walkrunwrestle.com">contact@walkrunwrestle.com</a>) and we’ll issue a personalised version by email.
@@ -186,7 +210,7 @@ const clearBtn = document.getElementById("clearBtn");
 const status = document.getElementById("status");
 
 const certImage = new Image();
-certImage.src = "certificate.png";
+certImage.src = "certificate.png";  // MUST match repo filename
 
 let imageLoaded = false;
 let hasGenerated = false;
@@ -210,12 +234,14 @@ function redrawBase(){
 }
 
 function drawName(name) {
+
   const upperName = name.toUpperCase();
   const centerX = canvas.width / 2;
 
   // 🔒 Placement locked
   const nameY = (canvas.height * 0.625) + 18;
 
+  // 15% smaller than original
   let size = Math.round(canvas.width * 0.066);
 
   const maxWidth = canvas.width * 0.68;
@@ -246,22 +272,14 @@ function drawName(name) {
   ctx.shadowColor = "transparent";
 }
 
-function getOrdinal(n){
-  if (n > 3 && n < 21) return n + "th";
-  switch (n % 10){
-    case 1: return n + "st";
-    case 2: return n + "nd";
-    case 3: return n + "rd";
-    default: return n + "th";
-  }
-}
-
 function drawDate() {
+
   const today = new Date();
-  const day = getOrdinal(today.getDate());
-  const month = today.toLocaleString("en-GB", { month: "long" });
-  const year = today.getFullYear();
-  const dateString = `${day} ${month} ${year}`;
+  const dateString = today.toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric"
+  });
 
   ctx.font = "36px Arial";
   ctx.fillStyle = "#ffffff";
@@ -283,6 +301,7 @@ function drawDate() {
 }
 
 function generateCertificate() {
+
   if (!imageLoaded) {
     status.textContent = "Still loading certificate image…";
     return;
@@ -304,6 +323,7 @@ function generateCertificate() {
 }
 
 function downloadCertificate() {
+
   if (!hasGenerated) {
     status.textContent = "Generate the certificate first.";
     return;
@@ -315,6 +335,7 @@ function downloadCertificate() {
   link.click();
 }
 
+/* If name changes after generate, re-disable download until re-generate */
 nameInput.addEventListener("input", () => {
   if (!imageLoaded) return;
   if (hasGenerated){
@@ -324,6 +345,7 @@ nameInput.addEventListener("input", () => {
   }
 });
 
+/* Clear/reset */
 function clearAll(){
   nameInput.value = "";
   hasGenerated = false;
