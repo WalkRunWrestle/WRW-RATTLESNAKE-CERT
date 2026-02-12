@@ -7,50 +7,42 @@
 
   <style>
     body {
-      background: #111;
+      background: #0e0e11;
       color: #fff;
       font-family: Arial, sans-serif;
       text-align: center;
       padding: 20px;
+      margin: 0;
     }
 
     h1 {
-      margin: 10px 0 18px;
-      font-size: 44px;
-      line-height: 1.05;
-      letter-spacing: 1px;
+      font-size: 36px;
       font-weight: 900;
-      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 20px;
     }
 
-    input, button {
+    input {
+      width: min(420px, 90%);
       padding: 14px;
       font-size: 18px;
-      margin: 8px 6px;
-      border-radius: 10px;
+      border-radius: 12px;
       border: none;
-      width: min(560px, 92vw);
-      max-width: 92vw;
-      box-sizing: border-box;
-    }
-
-    input{
+      margin-bottom: 12px;
       text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .btnRow{
-      display: grid;
-      gap: 10px;
-      justify-content: center;
-      margin-top: 6px;
     }
 
     button {
-      background: #f39c12;
+      width: min(420px, 90%);
+      padding: 16px;
+      font-size: 18px;
       font-weight: 900;
+      border-radius: 14px;
+      border: none;
+      margin: 8px 0;
       cursor: pointer;
-      width: min(560px, 92vw);
+      background: #f39c12;
+      color: #000;
     }
 
     button:disabled {
@@ -59,12 +51,12 @@
     }
 
     canvas {
-      margin-top: 18px;
-      border: 3px solid #f39c12;
+      margin-top: 20px;
+      border: 4px solid #f39c12;
+      border-radius: 14px;
       max-width: 100%;
       height: auto;
       background: #222;
-      border-radius: 6px;
     }
 
     #status {
@@ -77,14 +69,14 @@
 
 <body>
 
-  <h1>THE<br>RATTLESNAKE 10K<br>CERTIFICATE</h1>
+  <h1>THE RATTLESNAKE 10K CERTIFICATE</h1>
 
   <input id="nameInput" type="text" placeholder="ENTER YOUR NAME" />
 
-  <div class="btnRow">
-    <button id="generateBtn">Generate Certificate</button>
-    <button id="downloadBtn" disabled>Download Certificate</button>
-  </div>
+  <br>
+
+  <button id="generateBtn">Generate Certificate</button>
+  <button id="downloadBtn" disabled>Download Certificate</button>
 
   <div id="status">Loading certificate image…</div>
 
@@ -100,23 +92,10 @@
     const status = document.getElementById("status");
 
     const certImage = new Image();
-    certImage.src = "certificate.png"; // MUST match filename in repo
+    certImage.src = "certificate.png";
 
     let imageLoaded = false;
     let hasGenerated = false;
-
-    nameInput.addEventListener("input", () => {
-      nameInput.value = nameInput.value
-        .toUpperCase()
-        .replace(/\s+/g, " ");
-    });
-
-    nameInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        generateCertificate();
-      }
-    });
 
     certImage.onload = () => {
       imageLoaded = true;
@@ -130,112 +109,56 @@
       status.textContent = "ERROR: certificate.png failed to load.";
     };
 
-    function clearAndRedrawBase(){
-      ctx.setTransform(1,0,0,1,0,0);
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.drawImage(certImage, 0, 0);
-    }
-
-    function sanitizeName(raw){
-      return String(raw || "")
-        .trim()
-        .replace(/\s+/g, " ")
-        .toUpperCase();
-    }
-
-    function fitTextToBox(text, boxW, boxH, startPx, minPx, fontStack){
-      let size = startPx;
-      while (size >= minPx){
-        ctx.font = `900 ${size}px ${fontStack}`;
-        const m = ctx.measureText(text);
-
-        const textH = (m.actualBoundingBoxAscent && m.actualBoundingBoxDescent)
-          ? (m.actualBoundingBoxAscent + m.actualBoundingBoxDescent)
-          : size;
-
-        const textW = m.width;
-
-        if (textW <= boxW && textH <= boxH) return size;
-        size -= 2;
-      }
-      return minPx;
-    }
-
     function drawName(name) {
-      const upperName = sanitizeName(name);
+      const upperName = name.toUpperCase();
+      const x = canvas.width / 2;
+      const y = canvas.height * 0.675;
 
-      // ✅ MOVED DOWN + MADE SLIGHTLY SHORTER
-      // If you want it even lower later: change 0.600 -> 0.610
-      const box = {
-        x: canvas.width * 0.20,
-        y: canvas.height * 0.600,   // <-- moved DOWN (was 0.545/0.585 area)
-        w: canvas.width * 0.60,
-        h: canvas.height * 0.085    // <-- shorter height = forces smaller text
-      };
-
-      const x = box.x + (box.w / 2);
-      const y = box.y + (box.h / 2);
-
-      const fontStack = `"Arial Black", "Helvetica Neue", Arial, sans-serif`;
-
-      // ✅ START SMALLER + ALLOW SMALLER MIN
-      const startSize = Math.round(canvas.width * 0.075); // smaller start (was 0.10)
-      const minSize = 28; // allow smaller (was 42)
-
-      const finalSize = fitTextToBox(upperName, box.w, box.h, startSize, minSize, fontStack);
+      // Dynamic scaling
+      let fontSize = Math.round(canvas.width * 0.08);
+      ctx.font = `900 ${fontSize}px Arial`;
+      while (ctx.measureText(upperName).width > canvas.width * 0.75) {
+        fontSize -= 2;
+        ctx.font = `900 ${fontSize}px Arial`;
+      }
 
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.font = `900 ${finalSize}px ${fontStack}`;
 
-      // Cleaner shadow
-      ctx.shadowColor = "rgba(0,0,0,0.55)";
-      ctx.shadowBlur = 9;
-      ctx.shadowOffsetX = 2;
+      ctx.shadowColor = "rgba(0,0,0,0.6)";
+      ctx.shadowBlur = 8;
+      ctx.shadowOffsetX = 3;
       ctx.shadowOffsetY = 3;
 
-      // ✅ THINNER OUTLINE (less chunky)
-      ctx.lineJoin = "round";
-      ctx.miterLimit = 2;
-
-      ctx.lineWidth = Math.max(2, Math.round(finalSize * 0.055));
-      ctx.strokeStyle = "rgba(0,0,0,0.80)";
-      ctx.strokeText(upperName, x, y);
-
-      ctx.fillStyle = "#F5F5F5";
+      ctx.fillStyle = "#ffffff";
       ctx.fillText(upperName, x, y);
 
       ctx.shadowColor = "transparent";
-      ctx.shadowBlur = 0;
-      ctx.shadowOffsetX = 0;
-      ctx.shadowOffsetY = 0;
     }
 
     function drawDate() {
       const today = new Date();
       const dateString = today.toLocaleDateString("en-GB", {
-        day: "numeric",
+        day: "2-digit",
         month: "short",
         year: "numeric"
       });
 
       const x = canvas.width / 2;
-      const y = canvas.height * 0.92;
+      const y = canvas.height * 0.905;
 
-      const size = Math.max(26, Math.round(canvas.width * 0.030));
-      ctx.font = `800 ${size}px Arial, sans-serif`;
-      ctx.fillStyle = "#FFFFFF";
+      const size = Math.max(22, Math.round(canvas.width * 0.024));
+      ctx.font = `700 ${size}px Arial, sans-serif`;
+
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
 
-      ctx.shadowColor = "rgba(0,0,0,0.45)";
-      ctx.shadowBlur = 6;
+      ctx.shadowColor = "rgba(0,0,0,0.4)";
+      ctx.shadowBlur = 5;
       ctx.shadowOffsetX = 2;
       ctx.shadowOffsetY = 2;
 
-      ctx.lineWidth = 3;
-      ctx.strokeStyle = "rgba(0,0,0,0.75)";
-      ctx.strokeText(dateString, x, y);
+      ctx.fillStyle = "#FFFFFF";
       ctx.fillText(dateString, x, y);
 
       ctx.shadowColor = "transparent";
@@ -247,13 +170,15 @@
         return;
       }
 
-      const name = sanitizeName(nameInput.value);
+      const name = nameInput.value.trim();
       if (!name) {
         status.textContent = "Enter your name first.";
         return;
       }
 
-      clearAndRedrawBase();
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(certImage, 0, 0);
+
       drawName(name);
       drawDate();
 
@@ -263,13 +188,10 @@
     }
 
     function downloadCertificate() {
-      if (!hasGenerated) {
-        status.textContent = "Generate the certificate first.";
-        return;
-      }
+      if (!hasGenerated) return;
 
       const link = document.createElement("a");
-      link.download = "WRW_RATTLESNAKE_10K_CERTIFICATE.png";
+      link.download = "THE_RATTLESNAKE_10K_CERTIFICATE.png";
       link.href = canvas.toDataURL("image/png");
       link.click();
     }
