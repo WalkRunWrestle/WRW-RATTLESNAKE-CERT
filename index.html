@@ -78,7 +78,7 @@ const downloadBtn = document.getElementById("downloadBtn");
 const status = document.getElementById("status");
 
 const certImage = new Image();
-certImage.src = "certificate.png";  // MUST match your repo filename
+certImage.src = "certificate.png";  // MUST match repo filename
 
 let imageLoaded = false;
 let hasGenerated = false;
@@ -98,13 +98,12 @@ certImage.onerror = () => {
 function drawName(name) {
 
   const upperName = name.toUpperCase();
-
   const centerX = canvas.width / 2;
 
-  // 🔒 DO NOT CHANGE — placement locked
-  const nameY = canvas.height * 0.625;
+  // 🔒 Placement locked — moved DOWN 4px
+  const nameY = (canvas.height * 0.625) + 4;
 
-  // ✅ 15% smaller than original
+  // 15% smaller than original
   let size = Math.round(canvas.width * 0.066);
 
   const maxWidth = canvas.width * 0.68;
