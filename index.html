@@ -243,14 +243,24 @@ function drawName(name) {
   ctx.shadowColor = "transparent";
 }
 
+/* NEW: full date with ordinal (12th February 2026) */
+function getOrdinal(n){
+  if (n > 3 && n < 21) return n + "th";
+  switch (n % 10){
+    case 1: return n + "st";
+    case 2: return n + "nd";
+    case 3: return n + "rd";
+    default: return n + "th";
+  }
+}
+
 function drawDate() {
 
   const today = new Date();
-  const dateString = today.toLocaleDateString("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric"
-  });
+  const day = getOrdinal(today.getDate());
+  const month = today.toLocaleString("en-GB", { month: "long" });
+  const year = today.getFullYear();
+  const dateString = `${day} ${month} ${year}`;
 
   ctx.font = "36px Arial";
   ctx.fillStyle = "#ffffff";
@@ -337,3 +347,4 @@ clearBtn.addEventListener("click", clearAll);
 
 </body>
 </html>
+```0
