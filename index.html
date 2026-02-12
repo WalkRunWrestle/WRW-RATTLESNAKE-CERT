@@ -87,7 +87,7 @@ const downloadBtn = document.getElementById("downloadBtn");
 const status = document.getElementById("status");
 
 const certImage = new Image();
-certImage.src = "certificate.png"; // MUST match filename in repo
+certImage.src = "certificate.png";
 
 let imageLoaded = false;
 let hasGenerated = false;
@@ -104,14 +104,13 @@ certImage.onerror = () => {
   status.textContent = "ERROR: certificate.png failed to load.";
 };
 
-/* ---------- TEXT HELPERS ---------- */
+/* ---------- HELPERS ---------- */
 function measure(text, font){
   ctx.font = font;
   return ctx.measureText(text).width;
 }
 
 function splitToTwoLines(words){
-  // Balanced split (best for 3-5 words names)
   if (words.length < 2) return [words.join(" ")];
 
   let best = null;
@@ -138,58 +137,58 @@ function drawFittedLine(text, x, y, maxWidth, startPx, minPx){
   return fontSize;
 }
 
-/* ---------- DRAW NAME (FIXED FOR LONG NAMES) ---------- */
+/* ---------- NAME (FIXED: move DOWN so it doesn't cover AWARDED TO) ---------- */
 function drawName(name){
   const upperName = name.toUpperCase().replace(/\s+/g, " ").trim();
 
-  // SAFE BOX: avoid fox on left + keep inside right border
-  const safeLeft  = canvas.width * 0.20;  // push right of fox
-  const safeRight = canvas.width * 0.94;  // keep inside frame
+  // SAFE BOX (keeps away from fox and inside frame)
+  const safeLeft  = canvas.width * 0.20;
+  const safeRight = canvas.width * 0.94;
   const maxWidth  = safeRight - safeLeft;
   const x = (safeLeft + safeRight) / 2;
 
-  // Base Y (your sweet spot)
-  const baseY = canvas.height * 0.625;
+  // ✅ KEY FIX: push name DOWN into the correct band
+  // (Your screenshot shows it sitting too high covering "AWARDED TO")
+  const baseY = canvas.height * 0.655;
 
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
-  // Shadow (keep subtle)
-  ctx.shadowColor = "rgba(0,0,0,0.5)";
-  ctx.shadowBlur = 8;
+  // Shadow (subtle)
+  ctx.shadowColor = "rgba(0,0,0,0.45)";
+  ctx.shadowBlur = 7;
   ctx.shadowOffsetX = 3;
   ctx.shadowOffsetY = 3;
 
   ctx.fillStyle = "#f5f5f5";
 
-  // Start size
-  const startPx = Math.round(canvas.width * 0.095);
-  const minPx   = Math.round(canvas.width * 0.055);
+  // Start size tuned slightly smaller so it doesn't bully the band
+  const startPx = Math.round(canvas.width * 0.090);
+  const minPx   = Math.round(canvas.width * 0.052);
 
-  // Try single-line first
+  // Try single-line
   const testFont = `900 ${startPx}px Impact`;
   const singleWidth = measure(upperName, testFont);
 
   if (singleWidth <= maxWidth){
     drawFittedLine(upperName, x, baseY, maxWidth, startPx, minPx);
   } else {
-    // If too long, split to 2 lines and fit each
+    // Split to 2 lines if needed
     const words = upperName.split(" ");
     const lines = splitToTwoLines(words);
 
-    // Draw 2-line stacked name a touch lower spacing
-    // so it stays inside that name area
-    const lineGap = Math.round(canvas.width * 0.010);
+    // ✅ tighter stacking so top line doesn't creep into "AWARDED TO"
+    const lineGap = Math.round(canvas.width * 0.006);
 
-    // Fit first line and use that as ref size
-    const usedPx1 = drawFittedLine(lines[0], x, baseY - (startPx * 0.38), maxWidth, startPx, minPx);
-    const usedPx2 = drawFittedLine(lines[1], x, baseY + (usedPx1 * 0.55) + lineGap, maxWidth, usedPx1, minPx);
+    // Put the two lines BOTH inside the name band, biased slightly downward
+    const usedPx1 = drawFittedLine(lines[0], x, baseY - (startPx * 0.32), maxWidth, startPx, minPx);
+    drawFittedLine(lines[1], x, baseY + (usedPx1 * 0.46) + lineGap, maxWidth, usedPx1, minPx);
   }
 
   ctx.shadowColor = "transparent";
 }
 
-/* ---------- DRAW DATE (BETTER BETWEEN LINES) ---------- */
+/* ---------- DATE (DO NOT TOUCH - left exactly as you had it) ---------- */
 function drawDate(){
   const today = new Date();
   const dateString = today.toLocaleDateString("en-GB",{
@@ -201,7 +200,6 @@ function drawDate(){
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
-  // Slightly smaller + moved up to sit between the two white lines
   const fontSize = Math.max(14, Math.round(canvas.width * 0.016));
   ctx.font = `700 ${fontSize}px Arial`;
   ctx.fillStyle = "#ffffff";
@@ -212,8 +210,7 @@ function drawDate(){
   ctx.shadowOffsetY = 2;
 
   const x = canvas.width / 2;
-  const y = canvas.height * 0.922; // moved UP
-
+  const y = canvas.height * 0.922; // unchanged
   ctx.fillText(dateString, x, y);
 
   ctx.shadowColor = "transparent";
