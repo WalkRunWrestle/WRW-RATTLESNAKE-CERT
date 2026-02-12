@@ -112,7 +112,9 @@ certImage.onerror = () => {
 function drawName(name){
   const upperName = name.toUpperCase();
   const x = canvas.width / 2;
-  const y = canvas.height * 0.625;   // ✅ moved up as requested
+
+  // ✅ slight DOWN
+  const y = canvas.height * 0.632;
 
   let fontSize = Math.round(canvas.width * 0.08);
   ctx.font = `900 ${fontSize}px Arial`;
@@ -147,8 +149,8 @@ function drawDate(){
 
   const x = canvas.width / 2;
 
-  // ✅ moved DOWN to sit between the 2 white lines
-  const y = canvas.height * 0.935;
+  // ✅ slight UP
+  const y = canvas.height * 0.928;
 
   const fontSize = Math.max(18, Math.round(canvas.width * 0.020));
   ctx.font = `700 ${fontSize}px Arial`;
