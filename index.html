@@ -2,50 +2,55 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>WRW THE RATTLESNAKE 10K Certificate</title>
+  <title>THE RATTLESNAKE 10K CERTIFICATE</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <!-- Better, consistent fonts on phones -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <!-- Anton = bold/condensed for the NAME, Inter = clean UI text -->
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
 
   <style>
     body {
       background: #111;
       color: #fff;
-      font-family: Inter, Arial, sans-serif;
+      font-family: Arial, sans-serif;
       text-align: center;
       padding: 20px;
     }
 
     h1 {
-      margin-bottom: 15px;
-      letter-spacing: 1.2px;
-      text-transform: uppercase; /* keep it in caps */
+      margin: 10px 0 18px;
+      font-size: 44px;
+      line-height: 1.05;
+      letter-spacing: 1px;
       font-weight: 900;
+      text-transform: uppercase;
     }
 
     input, button {
-      padding: 12px;
+      padding: 14px;
       font-size: 18px;
-      margin: 6px;
+      margin: 8px 6px;
       border-radius: 10px;
       border: none;
-      width: min(520px, 92vw);
+      width: min(560px, 92vw);
+      max-width: 92vw;
       box-sizing: border-box;
     }
 
-    input {
-      outline: none;
+    input{
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .btnRow{
+      display: grid;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 6px;
     }
 
     button {
       background: #f39c12;
       font-weight: 900;
       cursor: pointer;
-      width: min(520px, 92vw);
+      width: min(560px, 92vw);
     }
 
     button:disabled {
@@ -54,12 +59,12 @@
     }
 
     canvas {
-      margin-top: 20px;
+      margin-top: 18px;
       border: 3px solid #f39c12;
       max-width: 100%;
       height: auto;
       background: #222;
-      border-radius: 10px;
+      border-radius: 6px;
     }
 
     #status {
@@ -67,33 +72,14 @@
       font-size: 14px;
       opacity: 0.9;
     }
-
-    .btnRow {
-      display: grid;
-      gap: 10px;
-      justify-content: center;
-      margin-top: 6px;
-    }
-
-    @media (min-width: 600px){
-      .btnRow {
-        grid-template-columns: 1fr 1fr;
-        width: min(520px, 92vw);
-        margin-left: auto;
-        margin-right: auto;
-      }
-      .btnRow button { width: 100%; }
-      input { width: min(520px, 92vw); }
-    }
   </style>
 </head>
 
 <body>
 
-  <!-- CHANGED: Rattler -> THE RATTLESNAKE 10K (caps) -->
-  <h1>THE RATTLESNAKE 10K CERTIFICATE</h1>
+  <h1>THE<br>RATTLESNAKE 10K<br>CERTIFICATE</h1>
 
-  <input id="nameInput" type="text" placeholder="Enter your name" autocomplete="name" />
+  <input id="nameInput" type="text" placeholder="ENTER YOUR NAME" />
 
   <div class="btnRow">
     <button id="generateBtn">Generate Certificate</button>
@@ -117,59 +103,90 @@
     certImage.src = "certificate.png"; // MUST match filename in repo
 
     let imageLoaded = false;
-    let fontsReady = false;
     let hasGenerated = false;
 
-    // --- Helpers ---
+    // Collapse spaces + uppercase as they type
+    nameInput.addEventListener("input", () => {
+      nameInput.value = nameInput.value
+        .toUpperCase()
+        .replace(/\s+/g, " "); // collapse multiple spaces
+    });
+
+    // Enter to generate (phone-friendly)
+    nameInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        generateCertificate();
+      }
+    });
+
+    certImage.onload = () => {
+      imageLoaded = true;
+      canvas.width = certImage.naturalWidth;
+      canvas.height = certImage.naturalHeight;
+      ctx.drawImage(certImage, 0, 0);
+      status.textContent = "Ready. Enter your name and press Generate.";
+    };
+
+    certImage.onerror = () => {
+      status.textContent = "ERROR: certificate.png failed to load.";
+    };
+
     function clearAndRedrawBase(){
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(certImage, 0, 0);
     }
 
-    function fitTextToWidth(text, maxWidth, startingPx, minPx, fontFamily, fontWeight = 400){
-      let size = startingPx;
+    // Fit text into a max width by shrinking font size
+    function fitFontSize(text, maxWidth, startPx, minPx){
+      let size = startPx;
       while (size > minPx){
-        ctx.font = `${fontWeight} ${size}px ${fontFamily}`;
+        ctx.font = `900 ${size}px Impact, Arial Black, Arial, sans-serif`;
         const w = ctx.measureText(text).width;
-        if (w <= maxWidth) break;
+        if (w <= maxWidth) return size;
         size -= 2;
       }
-      return size;
+      return minPx;
+    }
+
+    function sanitizeName(raw){
+      return String(raw || "")
+        .trim()
+        .replace(/\s+/g, " ")
+        .toUpperCase();
     }
 
     function drawName(name) {
-      const upperName = String(name).trim().toUpperCase();
+      const upperName = sanitizeName(name);
 
-      // Safe margins for long names
-      const maxWidth = canvas.width * 0.78;
+      // --- NAME AREA TUNING ---
+      // Keep it inside the "AWARDED TO" band area
+      const x = canvas.width / 2;
+      const y = canvas.height * 0.655;              // moved slightly UP vs your broken one
+      const maxWidth = canvas.width * 0.66;         // safe width inside bars
 
-      // Anton is loaded from Google Fonts; fallback if it fails
-      const family = `"Anton", "Impact", "Arial Black", Arial, sans-serif`;
+      // Start size based on canvas width, but clamp it
+      const startSize = Math.round(canvas.width * 0.11); // strong but not stupid
+      const minSize = 46;
 
-      // Auto-fit size so long names don't run off the certificate
-      const startSize = Math.round(canvas.width * 0.11); // scales with image size
-      const minSize   = Math.round(canvas.width * 0.055);
-      const fittedSize = fitTextToWidth(upperName, maxWidth, startSize, minSize, family, 400);
+      const finalSize = fitFontSize(upperName, maxWidth, startSize, minSize);
 
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
 
-      // Fill + stroke = readable on any background
-      ctx.font = `400 ${fittedSize}px ${family}`;
-      ctx.fillStyle = "#F5F5F5";
-
-      ctx.shadowColor = "rgba(0,0,0,0.45)";
-      ctx.shadowBlur = 8;
-      ctx.shadowOffsetX = 3;
+      // Shadow (subtle)
+      ctx.shadowColor = "rgba(0,0,0,0.55)";
+      ctx.shadowBlur = 10;
+      ctx.shadowOffsetX = 2;
       ctx.shadowOffsetY = 3;
 
-      const x = canvas.width / 2;
-      const y = canvas.height * 0.67; // under AWARDED TO (same as before)
-
-      // Outline for extra clarity
-      ctx.lineWidth = Math.max(4, Math.round(fittedSize * 0.08));
-      ctx.strokeStyle = "rgba(0,0,0,0.55)";
+      // Outline then fill (cleaner on smoke)
+      ctx.font = `900 ${finalSize}px Impact, Arial Black, Arial, sans-serif`;
+      ctx.lineWidth = Math.max(6, Math.round(finalSize * 0.09));
+      ctx.strokeStyle = "rgba(0,0,0,0.85)";
       ctx.strokeText(upperName, x, y);
+
+      ctx.fillStyle = "#F5F5F5";
       ctx.fillText(upperName, x, y);
 
       // Reset shadow
@@ -187,71 +204,35 @@
         year: "numeric"
       });
 
-      // Scales a bit for different image sizes
-      const size = Math.max(28, Math.round(canvas.width * 0.033));
+      const x = canvas.width / 2;
+      const y = canvas.height * 0.92;
 
-      ctx.font = `700 ${size}px "Inter", Arial, sans-serif`;
+      const size = Math.max(28, Math.round(canvas.width * 0.032));
+      ctx.font = `800 ${size}px Arial, sans-serif`;
       ctx.fillStyle = "#FFFFFF";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
 
-      ctx.shadowColor = "rgba(0,0,0,0.35)";
-      ctx.shadowBlur = 5;
+      ctx.shadowColor = "rgba(0,0,0,0.45)";
+      ctx.shadowBlur = 6;
       ctx.shadowOffsetX = 2;
       ctx.shadowOffsetY = 2;
 
-      const x = canvas.width / 2;
-      const y = canvas.height * 0.93; // under 10 KILOMETERS
-
-      // Outline for clarity
-      ctx.lineWidth = Math.max(3, Math.round(size * 0.09));
-      ctx.strokeStyle = "rgba(0,0,0,0.45)";
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = "rgba(0,0,0,0.75)";
       ctx.strokeText(dateString, x, y);
       ctx.fillText(dateString, x, y);
 
       ctx.shadowColor = "transparent";
-      ctx.shadowBlur = 0;
-      ctx.shadowOffsetX = 0;
-      ctx.shadowOffsetY = 0;
     }
-
-    async function ensureFontsReady(){
-      // Wait for web fonts so canvas uses them properly (mobile-friendly)
-      try{
-        if (document.fonts && document.fonts.ready){
-          await document.fonts.ready;
-        }
-      }catch(e){}
-      fontsReady = true;
-    }
-
-    // --- Image load ---
-    certImage.onload = async () => {
-      imageLoaded = true;
-      canvas.width = certImage.naturalWidth;
-      canvas.height = certImage.naturalHeight;
-
-      await ensureFontsReady();
-
-      clearAndRedrawBase();
-      status.textContent = "Ready. Enter your name and press Generate.";
-    };
-
-    certImage.onerror = () => {
-      status.textContent = "ERROR: certificate.png failed to load.";
-    };
 
     function generateCertificate() {
       if (!imageLoaded) {
         status.textContent = "Still loading certificate image…";
         return;
       }
-      if (!fontsReady) {
-        status.textContent = "Loading fonts… try again in a second.";
-        return;
-      }
 
-      const name = nameInput.value.trim();
+      const name = sanitizeName(nameInput.value);
       if (!name) {
         status.textContent = "Enter your name first.";
         return;
@@ -273,7 +254,6 @@
       }
 
       const link = document.createElement("a");
-      // CHANGED: filename reflects Rattlesnake 10K
       link.download = "WRW_RATTLESNAKE_10K_CERTIFICATE.png";
       link.href = canvas.toDataURL("image/png");
       link.click();
@@ -281,23 +261,7 @@
 
     generateBtn.addEventListener("click", generateCertificate);
     downloadBtn.addEventListener("click", downloadCertificate);
-
-    // Mobile UX: press Enter to generate
-    nameInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        generateCertificate();
-      }
-    });
-
-    // Bonus: auto-uppercase as they type (matches WRW vibe)
-    nameInput.addEventListener("input", () => {
-      const pos = nameInput.selectionStart;
-      nameInput.value = nameInput.value.toUpperCase();
-      try { nameInput.setSelectionRange(pos, pos); } catch(e){}
-    });
   </script>
 
 </body>
 </html>
-```0
