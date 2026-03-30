@@ -6,90 +6,110 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-body {
-  background: #111;
-  color: #fff;
-  font-family: Arial, sans-serif;
-  text-align: center;
-  padding: 20px;
-}
-
-h1 {
-  margin-bottom: 10px;
-}
-
-.subLine{
-  margin: 0 auto 14px auto;
-  max-width: 600px;
-  opacity: 0.92;
-  font-size: 14px;
-  line-height: 1.35;
-}
-
 :root{
   --wrw-green:#048d64;
   --wrw-green-dark:#036c4b;
   --wrw-green-light:#0ab17e;
-  --topBoxMax: 420px;
-  --topRadius: 14px;
+  --panel-width: 720px;
+  --control-width: 420px;
+  --radius: 18px;
+}
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  background:#0b0b0d;
+  color:#fff;
+  font-family:Arial, sans-serif;
+  text-align:center;
+  padding:28px 16px 36px;
+}
+
+.page{
+  width:100%;
+  max-width:var(--panel-width);
+  margin:0 auto;
+}
+
+h1{
+  margin:0 0 14px 0;
+  font-size:clamp(34px, 7vw, 62px);
+  line-height:0.95;
+  font-weight:900;
+  letter-spacing:0.5px;
+  text-transform:uppercase;
+}
+
+.subLine{
+  margin:0 auto 14px auto;
+  max-width:640px;
+  opacity:0.94;
+  font-size:14px;
+  line-height:1.45;
 }
 
 .siteLink{
-  margin-top: 10px;
+  margin-top:12px;
 }
 
 .siteLink a{
   display:block;
   width:100%;
-  max-width: var(--topBoxMax);
-  margin: 0 auto;
-  padding:14px 18px;
-  border-radius: var(--topRadius);
+  max-width:var(--control-width);
+  margin:0 auto;
+  padding:16px 18px;
+  border-radius:var(--radius);
   font-size:14px;
   font-weight:900;
   letter-spacing:1.8px;
   text-transform:uppercase;
   color:#ffffff;
   text-decoration:none;
-  background: linear-gradient(135deg, var(--wrw-green-dark), var(--wrw-green), var(--wrw-green-light));
+  background:linear-gradient(135deg, var(--wrw-green-dark), var(--wrw-green), var(--wrw-green-light));
   border:1px solid rgba(4,141,100,.6);
   box-shadow:
     0 12px 26px rgba(0,0,0,.55),
     0 0 18px rgba(4,141,100,.25);
 }
 
-input {
+input{
   width:100%;
-  max-width: var(--topBoxMax);
-  margin:14px auto;
-  padding:14px 18px;
+  max-width:var(--control-width);
+  margin:16px auto 0;
+  padding:16px 18px;
   font-size:18px;
-  border-radius: var(--topRadius);
+  border-radius:var(--radius);
   border:none;
   display:block;
+  outline:none;
 }
 
 .buttonRow{
   display:flex;
   gap:12px;
-  max-width: var(--topBoxMax);
-  margin:10px auto;
+  width:100%;
+  max-width:var(--control-width);
+  margin:14px auto 0;
 }
 
 .buttonRow button{
   flex:1;
+  min-height:92px;
 }
 
-button {
+button{
   padding:14px;
   font-size:18px;
-  border-radius:14px;
+  border-radius:var(--radius);
   border:none;
-  font-weight:bold;
+  font-weight:900;
   cursor:pointer;
 }
 
-button:disabled {
+button:disabled{
   opacity:0.5;
   cursor:not-allowed;
 }
@@ -104,20 +124,28 @@ button:disabled {
   color:#fff;
 }
 
-canvas {
-  margin-top: 20px;
-  border: 3px solid var(--wrw-green);
-  max-width: 100%;
-  height: auto;
-  background: #222;
+.canvasWrap{
+  width:100%;
+  max-width:var(--panel-width);
+  margin:26px auto 0;
+}
+
+canvas{
+  display:block;
+  width:100%;
+  max-width:100%;
+  height:auto;
+  margin:0 auto;
+  border:4px solid var(--wrw-green);
+  background:#222;
 }
 
 .note{
-  margin: 18px auto 0 auto;
-  max-width: 600px;
-  font-size: 13px;
-  line-height: 1.35;
-  opacity: 0.9;
+  margin:20px auto 0;
+  max-width:640px;
+  font-size:13px;
+  line-height:1.5;
+  opacity:0.92;
 }
 
 .note a{
@@ -125,42 +153,77 @@ canvas {
   text-decoration:none;
   font-weight:700;
 }
+
+@media (max-width:560px){
+  body{
+    padding:20px 12px 28px;
+  }
+
+  h1{
+    font-size:clamp(28px, 10vw, 48px);
+    line-height:1.02;
+    margin-bottom:12px;
+  }
+
+  .subLine{
+    font-size:13px;
+    margin-bottom:12px;
+  }
+
+  .siteLink a,
+  input{
+    max-width:100%;
+  }
+
+  .buttonRow{
+    max-width:100%;
+  }
+
+  .buttonRow button{
+    min-height:84px;
+    font-size:17px;
+  }
+}
 </style>
 </head>
 
 <body>
 
-<h1>WRW RATTLESNAKE 10K CERTIFICATE</h1>
+<div class="page">
+  <h1>WRW RATTLESNAKE<br>10K CERTIFICATE</h1>
 
-<div class="subLine">
-  Congrats on finishing the Rattlesnake 10K. Ready for your next challenge?
-  <div class="siteLink">
-    <a href="https://walkrunwrestle.com" target="_blank" rel="noopener">
-      WALKRUNWRESTLE.COM
-    </a>
+  <div class="subLine">
+    Congrats on finishing the Rattlesnake 10K. Ready for your next challenge?
+    <div class="siteLink">
+      <a href="https://walkrunwrestle.com" target="_blank" rel="noopener">
+        WALKRUNWRESTLE.COM
+      </a>
+    </div>
   </div>
-</div>
 
-<input
-  id="nameInput"
-  type="text"
-  placeholder="Enter your full name"
-  autocomplete="name"
-  autocapitalize="words"
-  spellcheck="false"
-/>
+  <input
+    id="nameInput"
+    type="text"
+    placeholder="Enter your full name"
+    autocomplete="name"
+    autocapitalize="words"
+    spellcheck="false"
+  />
 
-<div class="buttonRow">
-  <button id="generateBtn" class="primaryBtn">Create Certificate</button>
-  <button id="downloadBtn" class="secondaryBtn" disabled>Download Certificate</button>
-</div>
+  <div class="buttonRow">
+    <button id="generateBtn" class="primaryBtn">Create Certificate</button>
+    <button id="downloadBtn" class="secondaryBtn" disabled>Download Certificate</button>
+  </div>
 
-<canvas id="canvas"></canvas>
+  <div class="canvasWrap">
+    <canvas id="canvas"></canvas>
+  </div>
 
-<div class="note">
-  If your name looks too long or spacing looks off, email
-  <a href="mailto:contact@walkrunwrestle.com">contact@walkrunwrestle.com</a>
-  and we’ll send a personalised version.
+  <div class="note">
+    If your name looks too long or spacing looks off, email
+    <a href="mailto:contact@walkrunwrestle.com">contact@walkrunwrestle.com</a>
+    and we’ll send a personalised version.
+  </div>
 </div>
 
 <script>
@@ -282,4 +345,4 @@ downloadBtn.addEventListener("click", downloadCertificate);
 </script>
 
 </body>
-</html> 
+</html>
