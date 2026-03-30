@@ -26,8 +26,10 @@ h1 {
   line-height: 1.35;
 }
 
-/* 🔧 Smaller top width */
 :root{
+  --wrw-green:#048d64;
+  --wrw-green-dark:#036c4b;
+  --wrw-green-light:#0ab17e;
   --topBoxMax: 420px;
   --topRadius: 14px;
 }
@@ -35,6 +37,7 @@ h1 {
 .siteLink{
   margin-top: 10px;
 }
+
 .siteLink a{
   display:block;
   width:100%;
@@ -46,16 +49,15 @@ h1 {
   font-weight:900;
   letter-spacing:1.8px;
   text-transform:uppercase;
-  color:#141418;
+  color:#ffffff;
   text-decoration:none;
-  background: linear-gradient(135deg, rgba(230,184,74,1), rgba(255,214,107,1), rgba(194,143,44,1));
-  border:1px solid rgba(255,214,107,.95);
+  background: linear-gradient(135deg, var(--wrw-green-dark), var(--wrw-green), var(--wrw-green-light));
+  border:1px solid rgba(4,141,100,.6);
   box-shadow:
     0 12px 26px rgba(0,0,0,.55),
-    0 0 18px rgba(230,184,74,.18);
+    0 0 18px rgba(4,141,100,.25);
 }
 
-/* 🔧 Name box matches link width */
 input {
   width:100%;
   max-width: var(--topBoxMax);
@@ -93,17 +95,18 @@ button:disabled {
 }
 
 .primaryBtn{
-  background:#f39c12;
+  background:var(--wrw-green);
+  color:#fff;
 }
 
 .secondaryBtn{
-  background:#8a5b12;
-  color:#111;
+  background:var(--wrw-green-dark);
+  color:#fff;
 }
 
 canvas {
   margin-top: 20px;
-  border: 3px solid #f39c12;
+  border: 3px solid var(--wrw-green);
   max-width: 100%;
   height: auto;
   background: #222;
@@ -116,8 +119,9 @@ canvas {
   line-height: 1.35;
   opacity: 0.9;
 }
+
 .note a{
-  color:#f39c12;
+  color:var(--wrw-green);
   text-decoration:none;
   font-weight:700;
 }
@@ -140,23 +144,23 @@ canvas {
 <input
   id="nameInput"
   type="text"
-  placeholder="Enter your name"
+  placeholder="Enter your full name"
   autocomplete="name"
   autocapitalize="words"
   spellcheck="false"
 />
 
 <div class="buttonRow">
-  <button id="generateBtn" class="primaryBtn">Generate</button>
-  <button id="downloadBtn" class="secondaryBtn" disabled>Download</button>
+  <button id="generateBtn" class="primaryBtn">Create Certificate</button>
+  <button id="downloadBtn" class="secondaryBtn" disabled>Download Certificate</button>
 </div>
 
 <canvas id="canvas"></canvas>
 
 <div class="note">
-  For some long names, formatting may vary slightly. If needed, contact us
-  (<a href="mailto:contact@walkrunwrestle.com">contact@walkrunwrestle.com</a>)
-  and we’ll issue a personalised version by email.
+  If your name looks too long or spacing looks off, email
+  <a href="mailto:contact@walkrunwrestle.com">contact@walkrunwrestle.com</a>
+  and we’ll send a personalised version.
 </div>
 
 <script>
@@ -189,7 +193,6 @@ function redrawBase(){
 function drawName(name){
   const upperName = name.toUpperCase();
   const centerX = canvas.width / 2;
-
   const nameY = (canvas.height * 0.625) + 18;
 
   let size = Math.round(canvas.width * 0.066);
@@ -225,12 +228,12 @@ function drawDate(){
   const today = new Date();
 
   function getOrdinal(n){
-    if (n>3 && n<21) return "th";
-    switch(n%10){
-      case 1:return "st";
-      case 2:return "nd";
-      case 3:return "rd";
-      default:return "th";
+    if (n > 3 && n < 21) return "th";
+    switch(n % 10){
+      case 1: return "st";
+      case 2: return "nd";
+      case 3: return "rd";
+      default: return "th";
     }
   }
 
@@ -279,4 +282,4 @@ downloadBtn.addEventListener("click", downloadCertificate);
 </script>
 
 </body>
-</html>
+</html> 
